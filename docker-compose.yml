@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: ironturtleapp
+    build: .  
+    environment:
+      NODE_ENV: production
+    labels:
+      - "dockflare.enable=true"
+      - "dockflare.hostname=it.cubegrid.org"
+      - "dockflare.service=http://ironturtleapp:3000"
+    networks:
+      - cloudflare-net
+networks:
+  cloudflare-net:
+    name: cloudflare-net
+    external: true
