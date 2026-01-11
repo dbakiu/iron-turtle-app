@@ -69,7 +69,10 @@ export const activeWorkoutApi = createApi({
           })),
         };
         
-        activeWorkoutDb.exercises.push(newExercise);
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: [...activeWorkoutDb.exercises, newExercise],
+        };
         return { data: newExercise };
       },
       invalidatesTags: ['ActiveWorkout'],
@@ -83,8 +86,12 @@ export const activeWorkoutApi = createApi({
           return { error: { status: 400, data: 'No active workout' } };
         }
         
-        activeWorkoutDb.exercises = activeWorkoutDb.exercises.filter(e => e.id !== exerciseId);
-        activeWorkoutDb.exercises.forEach((e, i) => { e.order = i; });
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: activeWorkoutDb.exercises
+            .filter(e => e.id !== exerciseId)
+            .map((e, i) => ({ ...e, order: i })),
+        };
         
         return { data: undefined };
       },
@@ -107,7 +114,10 @@ export const activeWorkoutApi = createApi({
           return null;
         }).filter(Boolean) as WorkoutExercise[];
         
-        activeWorkoutDb.exercises = reordered;
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: reordered,
+        };
         return { data: undefined };
       },
       invalidatesTags: ['ActiveWorkout'],
@@ -121,19 +131,31 @@ export const activeWorkoutApi = createApi({
           return { error: { status: 400, data: 'No active workout' } };
         }
         
-        const exercise = activeWorkoutDb.exercises.find(e => e.id === exerciseId);
-        if (!exercise) {
-          return { error: { status: 404, data: 'Exercise not found' } };
+        if (!activeWorkoutDb) {
+          return { error: { status: 400, data: 'No active workout' } };
         }
         
-        const newSet: WorkoutSet = {
-          ...set,
-          id: generateUUID(),
-          sync_status: 'synced',
+        let newSet: WorkoutSet | undefined;
+
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: activeWorkoutDb.exercises.map(e => {
+            if (e.id === exerciseId) {
+              const newExercise = { ...e };
+              const createdSet: WorkoutSet = {
+                ...set,
+                id: generateUUID(),
+                sync_status: 'synced',
+              };
+              newExercise.sets = [...newExercise.sets, createdSet];
+              newSet = createdSet;
+              return newExercise;
+            }
+            return e;
+          })
         };
         
-        exercise.sets.push(newSet);
-        return { data: newSet };
+        return { data: newSet! };
       },
       invalidatesTags: ['ActiveWorkout'],
     }),
@@ -146,18 +168,31 @@ export const activeWorkoutApi = createApi({
           return { error: { status: 400, data: 'No active workout' } };
         }
         
-        const exercise = activeWorkoutDb.exercises.find(e => e.id === exerciseId);
-        if (!exercise) {
-          return { error: { status: 404, data: 'Exercise not found' } };
+        let updatedSet: WorkoutSet | undefined;
+
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: activeWorkoutDb.exercises.map(e => {
+            if (e.id === exerciseId) {
+              const newExercise = { ...e };
+              newExercise.sets = newExercise.sets.map(s => {
+                if (s.id === setId) {
+                  updatedSet = { ...s, ...updates, sync_status: 'synced' };
+                  return updatedSet;
+                }
+                return s;
+              });
+              return newExercise;
+            }
+            return e;
+          })
+        };
+
+        if (updatedSet) {
+          return { data: updatedSet };
         }
-        
-        const set = exercise.sets.find(s => s.id === setId);
-        if (!set) {
-          return { error: { status: 404, data: 'Set not found' } };
-        }
-        
-        Object.assign(set, updates, { sync_status: 'synced' });
-        return { data: set };
+
+        return { error: { status: 404, data: 'Set not found' } };
       },
       invalidatesTags: ['ActiveWorkout'],
     }),
@@ -170,21 +205,36 @@ export const activeWorkoutApi = createApi({
           return { error: { status: 400, data: 'No active workout' } };
         }
         
-        const exercise = activeWorkoutDb.exercises.find(e => e.id === exerciseId);
-        if (!exercise) {
-          return { error: { status: 404, data: 'Exercise not found' } };
+        let completedSet: WorkoutSet | undefined;
+
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: activeWorkoutDb.exercises.map(e => {
+            if (e.id === exerciseId) {
+              const newExercise = { ...e };
+              newExercise.sets = newExercise.sets.map(s => {
+                if (s.id === setId) {
+                  completedSet = {
+                    ...s,
+                    is_completed: true,
+                    completed_at: new Date().toISOString(),
+                    sync_status: 'synced',
+                  };
+                  return completedSet;
+                }
+                return s;
+              });
+              return newExercise;
+            }
+            return e;
+          })
+        };
+
+        if (completedSet) {
+          return { data: completedSet };
         }
-        
-        const set = exercise.sets.find(s => s.id === setId);
-        if (!set) {
-          return { error: { status: 404, data: 'Set not found' } };
-        }
-        
-        set.is_completed = true;
-        set.completed_at = new Date().toISOString();
-        set.sync_status = 'synced';
-        
-        return { data: set };
+
+        return { error: { status: 404, data: 'Set not found' } };
       },
       invalidatesTags: ['ActiveWorkout'],
     }),
@@ -197,12 +247,18 @@ export const activeWorkoutApi = createApi({
           return { error: { status: 400, data: 'No active workout' } };
         }
         
-        const exercise = activeWorkoutDb.exercises.find(e => e.id === exerciseId);
-        if (!exercise) {
-          return { error: { status: 404, data: 'Exercise not found' } };
-        }
-        
-        exercise.sets = exercise.sets.filter(s => s.id !== setId);
+        activeWorkoutDb = {
+          ...activeWorkoutDb,
+          exercises: activeWorkoutDb.exercises.map(e => {
+            if (e.id === exerciseId) {
+              const newExercise = { ...e };
+              newExercise.sets = newExercise.sets.filter(s => s.id !== setId);
+              return newExercise;
+            }
+            return e;
+          })
+        };
+
         return { data: undefined };
       },
       invalidatesTags: ['ActiveWorkout'],
