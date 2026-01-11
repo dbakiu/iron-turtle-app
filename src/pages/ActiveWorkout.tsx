@@ -1,3 +1,4 @@
+import { ActiveSetRow } from '@/components/ActiveSetRow';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Check, Clock, Dumbbell, X, Play } from 'lucide-react';
@@ -219,31 +220,12 @@ export default function ActiveWorkout() {
                 <h3 className="font-semibold mb-3">{workoutExercise.exercise.name}</h3>
                 <div className="space-y-2">
                   {workoutExercise.sets.map((set, index) => (
-                    <div 
+                    <ActiveSetRow
                       key={set.id}
-                      className={cn(
-                        'flex items-center gap-3 p-3 rounded-lg',
-                        set.is_completed ? 'bg-primary/10' : 'bg-muted/50'
-                      )}
-                    >
-                      <span className="w-6 text-center text-sm text-muted-foreground">{index + 1}</span>
-                      <span className={cn(
-                        'set-badge',
-                        set.set_type === 'WARMUP' && 'set-badge-warmup',
-                        set.set_type === 'WORKING' && 'set-badge-working',
-                        set.set_type === 'MYOREP' && 'set-badge-myorep',
-                        set.set_type === 'FAILURE' && 'set-badge-failure',
-                      )}>
-                        {set.set_type === 'WARMUP' ? 'W' : set.set_type === 'WORKING' ? 'R' : set.set_type === 'MYOREP' ? 'M' : 'F'}
-                      </span>
-                      <span className="text-sm">{set.weight}kg × {set.reps || set.duration || 0}</span>
-                      <span className={cn(
-                        'ml-auto w-8 h-8 rounded-lg flex items-center justify-center',
-                        set.is_completed ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      )}>
-                        {set.is_completed && <Check className="w-4 h-4" />}
-                      </span>
-                    </div>
+                      set={set}
+                      exerciseId={workoutExercise.id}
+                      setIndex={index}
+                    />
                   ))}
                 </div>
               </div>
