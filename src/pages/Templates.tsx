@@ -120,7 +120,7 @@ export default function Templates() {
                     disabled={!!activeWorkout}
                     className="shrink-0"
                   >
-                    <Play className="w-5 h-5" />
+                    <Play className="w-5 h-5 text-primary" />
                   </Button>
                 </div>
 
@@ -140,15 +140,7 @@ export default function Templates() {
                   </div>
                 </div>
 
-                <Button
-                  onClick={() => handleStartFromTemplate(template.id, template.name)}
-                  className="w-full"
-                  style={{ borderRadius: 'var(--radius)' }}
-                  disabled={!!activeWorkout}
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  {activeWorkout ? 'Workout in Progress' : 'Start Workout'}
-                </Button>
+
               </div>
             ))
           )}

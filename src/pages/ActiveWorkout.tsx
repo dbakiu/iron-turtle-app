@@ -23,6 +23,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -152,23 +159,38 @@ export default function ActiveWorkout() {
             <h2 className="text-2xl font-bold mb-2">No Active Workout</h2>
             <p className="text-muted-foreground mb-8">Start a new workout to begin tracking your sets</p>
             
-            <div className="space-y-3">
-              <Button
-                onClick={handleStartEmptyWorkout}
-                size="lg"
-                className="w-full"
-                style={{ borderRadius: 'var(--radius)' }}
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Start Empty Workout
-              </Button>
-              
-              <Link to="/templates" className="block">
-                <Button variant="outline" size="lg" className="w-full">
-                  Start from Template
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  size="lg"
+                  className="w-full"
+                  style={{ borderRadius: 'var(--radius)' }}
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Start Workout
                 </Button>
-              </Link>
-            </div>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[40vh]">
+                <SheetHeader>
+                  <SheetTitle>Start New Workout</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col space-y-4 mt-6">
+                  <Link to="/templates">
+                    <Button variant="default" size="lg" className="w-full">
+                      Start from Template
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleStartEmptyWorkout}
+                  >
+                    Start Empty Workout
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
         <BottomNav />
@@ -290,15 +312,7 @@ export default function ActiveWorkout() {
           )}
         </div>
 
-        {/* Add Exercise Button */}
-        {activeWorkout.exercises.length > 0 && (
-          <Link to="/exercises">
-            <Button variant="outline" className="w-full border-dashed">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Exercise
-            </Button>
-          </Link>
-        )}
+
       </div>
 
       {/* Rest Timer */}

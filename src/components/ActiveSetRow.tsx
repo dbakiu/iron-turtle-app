@@ -117,6 +117,7 @@ export function ActiveSetRow({ set, exerciseId, setIndex, isCurrent, isFuture }:
         variant="ghost"
         size="icon"
         onClick={handleComplete}
+        disabled={!isCurrent || set.is_completed}
         className={cn(
           'ml-auto w-10 h-10 rounded-lg',
           set.is_completed ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-muted hover:bg-muted-foreground/20'

@@ -1,6 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Play, Calendar, Dumbbell, Clock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { useGetActiveWorkoutQuery, useStartWorkoutMutation } from '@/store/api/activeWorkoutApi';
 import { useGetWorkoutHistoryQuery } from '@/store/api/historyApi';
 
@@ -50,15 +57,38 @@ export default function Dashboard() {
               </div>
             </Link>
           ) : (
-            <Button
-              onClick={handleStartEmptyWorkout}
-              size="lg"
-              className="w-full h-14 text-lg font-semibold"
-              style={{ borderRadius: 'var(--radius)' }}
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Start Empty Workout
-            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  size="lg"
+                  className="w-full h-14 text-lg font-semibold"
+                  style={{ borderRadius: 'var(--radius)' }}
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Start Workout
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[40vh]">
+                <SheetHeader>
+                  <SheetTitle>Start New Workout</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col space-y-4 mt-6">
+                  <Link to="/templates">
+                    <Button variant="default" size="lg" className="w-full">
+                      Start from Template
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleStartEmptyWorkout}
+                  >
+                    Start Empty Workout
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           )}
         </section>
 
