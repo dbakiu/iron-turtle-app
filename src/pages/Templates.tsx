@@ -5,7 +5,7 @@ import { useGetTemplatesQuery } from '@/store/api/templateApi';
 import { useStartWorkoutMutation, useGetActiveWorkoutQuery } from '@/store/api/activeWorkoutApi';
 import { TemplateTag, TEMPLATE_TAG_LABELS, WorkoutSet } from '@/types/workout';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { toggleTemplateTag } from '@/store/slices/uiSlice';
+import { toggleTemplateTag, setActiveExerciseId } from '@/store/slices/uiSlice';
 import { cn } from '@/lib/utils';
 
 export default function Templates() {
@@ -37,11 +37,16 @@ export default function Templates() {
       } as WorkoutSet)),
     }));
 
-    await startWorkout({ 
+    const result = await startWorkout({ 
       name: templateName, 
       template_id: templateId,
       exercises: workoutExercises,
     });
+
+    if ('data' in result && result.data?.exercises?.[0]) {
+      dispatch(setActiveExerciseId(result.data.exercises[0].id));
+    }
+    
     navigate('/workout/active');
   };
 

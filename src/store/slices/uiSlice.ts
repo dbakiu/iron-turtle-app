@@ -35,6 +35,7 @@ interface UiState {
   restTimer: RestTimerState;
   overlays: OverlaysState;
   workoutDuration: number; // Seconds since workout started (UI-tracked)
+  activeExerciseId: string | null;
 }
 
 const initialState: UiState = {
@@ -60,12 +61,20 @@ const initialState: UiState = {
     exerciseSwap: { isOpen: false, exerciseId: null },
   },
   workoutDuration: 0,
+  activeExerciseId: null,
 };
 
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
+    // ... (keep existing reducers)
+
+    // Active exercise
+    setActiveExerciseId: (state, action: PayloadAction<string | null>) => {
+      state.activeExerciseId = action.payload;
+    },
+    
     // Exercise filters
     setExerciseMuscleGroupFilter: (state, action: PayloadAction<PrimaryMuscleGroup[]>) => {
       state.exerciseFilters.muscleGroups = action.payload;
@@ -188,6 +197,7 @@ const uiSlice = createSlice({
 });
 
 export const {
+  setActiveExerciseId,
   setExerciseMuscleGroupFilter,
   setExerciseMovementPatternFilter,
   setExerciseEquipmentFilter,

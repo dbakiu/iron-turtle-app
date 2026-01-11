@@ -1,12 +1,12 @@
 import { ActiveSetRow } from '@/components/ActiveSetRow';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Check, Clock, Dumbbell, X, Play } from 'lucide-react';
+import { Plus, Check, Clock, Dumbbell, X, Play, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useGetActiveWorkoutQuery, useStartWorkoutMutation, useFinishWorkoutMutation, useDiscardWorkoutMutation } from '@/store/api/activeWorkoutApi';
+import { useGetActiveWorkoutQuery, useStartWorkoutMutation, useFinishWorkoutMutation, useDiscardWorkoutMutation, useAddSetMutation } from '@/store/api/activeWorkoutApi';
 import { useSaveCompletedWorkoutMutation } from '@/store/api/historyApi';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { tickWorkoutDuration, resetWorkoutDuration, startRestTimer, tickRestTimer, stopRestTimer, addRestTime } from '@/store/slices/uiSlice';
+import { tickWorkoutDuration, resetWorkoutDuration, startRestTimer, tickRestTimer, stopRestTimer, addRestTime, setActiveExerciseId } from '@/store/slices/uiSlice';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -31,8 +36,9 @@ export default function ActiveWorkout() {
   const [finishWorkout] = useFinishWorkoutMutation();
   const [discardWorkout] = useDiscardWorkoutMutation();
   const [saveCompletedWorkout] = useSaveCompletedWorkoutMutation();
+  const [addSet] = useAddSetMutation();
   
-  const { workoutDuration } = useAppSelector(state => state.ui);
+  const { workoutDuration, activeExerciseId } = useAppSelector(state => state.ui);
   const restTimer = useAppSelector(state => state.ui.restTimer);
 
   // Duration timer
@@ -97,6 +103,23 @@ export default function ActiveWorkout() {
   const handleDiscardWorkout = async () => {
     await discardWorkout();
     navigate('/');
+  };
+
+  const handleAddSet = (exerciseId: string) => {
+    const exercise = activeWorkout?.exercises.find(e => e.id === exerciseId);
+    if (!exercise) return;
+
+    const lastSet = exercise.sets[exercise.sets.length - 1];
+    const newSet = {
+      exercise_id: exercise.exercise.id,
+      set_type: lastSet?.set_type || 'WORKING',
+      weight: lastSet?.weight || 0,
+      reps: lastSet?.reps || 0,
+      duration: lastSet?.duration,
+      is_completed: false,
+    };
+    
+    addSet({ exerciseId, set: newSet });
   };
 
   const formatDuration = (seconds: number) => {
@@ -215,21 +238,55 @@ export default function ActiveWorkout() {
               </Link>
             </div>
           ) : (
-            activeWorkout.exercises.map((workoutExercise) => (
-              <div key={workoutExercise.id} className="stat-card">
-                <h3 className="font-semibold mb-3">{workoutExercise.exercise.name}</h3>
-                <div className="space-y-2">
-                  {workoutExercise.sets.map((set, index) => (
-                    <ActiveSetRow
-                      key={set.id}
-                      set={set}
-                      exerciseId={workoutExercise.id}
-                      setIndex={index}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))
+            activeWorkout.exercises.map((workoutExercise) => {
+              const currentSetIndex = workoutExercise.sets.findIndex(s => !s.is_completed);
+
+              return (
+                <Collapsible
+                  key={workoutExercise.id}
+                  open={activeExerciseId === workoutExercise.id}
+                  onOpenChange={(isOpen) =>
+                    dispatch(setActiveExerciseId(isOpen ? workoutExercise.id : null))
+                  }
+                >
+                  <div className="stat-card">
+                    <CollapsibleTrigger className="w-full">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-left">{workoutExercise.exercise.name}</h3>
+                        <ChevronDown
+                          className={cn(
+                            'w-5 h-5 text-muted-foreground transition-transform',
+                            activeExerciseId === workoutExercise.id && 'rotate-180'
+                          )}
+                        />
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="space-y-2 mt-3">
+                        {workoutExercise.sets.map((set, index) => (
+                          <ActiveSetRow
+                            key={set.id}
+                            set={set}
+                            exerciseId={workoutExercise.id}
+                            setIndex={index}
+                            isCurrent={index === currentSetIndex}
+                            isFuture={currentSetIndex !== -1 && index > currentSetIndex}
+                          />
+                        ))}
+                        <Button
+                          variant="outline"
+                          className="w-full border-dashed mt-2"
+                          onClick={() => handleAddSet(workoutExercise.id)}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Set
+                        </Button>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              )
+            })
           )}
         </div>
 

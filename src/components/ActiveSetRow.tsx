@@ -17,11 +17,13 @@ interface ActiveSetRowProps {
   set: WorkoutSet;
   exerciseId: string;
   setIndex: number;
+  isCurrent: boolean;
+  isFuture: boolean;
 }
 
 const setTypes: SetType[] = ['WARMUP', 'WORKING', 'MYOREP', 'FAILURE'];
 
-export function ActiveSetRow({ set, exerciseId, setIndex }: ActiveSetRowProps) {
+export function ActiveSetRow({ set, exerciseId, setIndex, isCurrent, isFuture }: ActiveSetRowProps) {
   const [weight, setWeight] = useState(set.weight.toString());
   const [reps, setReps] = useState((set.reps || set.duration || 0).toString());
   const [setType, setSetType] = useState(set.set_type);
@@ -60,8 +62,13 @@ export function ActiveSetRow({ set, exerciseId, setIndex }: ActiveSetRowProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-2 p-2 rounded-lg',
-        set.is_completed ? 'bg-primary/10' : 'bg-muted/50'
+        'flex items-center gap-2 p-2 rounded-lg transition-all',
+        set.is_completed
+          ? 'bg-primary/10'
+          : isCurrent
+          ? 'bg-primary/20'
+          : 'bg-muted/50',
+        isFuture && 'opacity-50'
       )}
     >
       <span className="w-6 text-center text-sm text-muted-foreground">{setIndex + 1}</span>
