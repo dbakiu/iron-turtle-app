@@ -7,7 +7,7 @@ import { useGetExercisesQuery } from '@/store/api/exerciseApi';
 import { useAddExerciseToWorkoutMutation, useGetActiveWorkoutQuery } from '@/store/api/activeWorkoutApi';
 import { Exercise, PrimaryMuscleGroup, MovementPattern, PRIMARY_MUSCLE_GROUP_LABELS, MOVEMENT_PATTERN_LABELS, EQUIPMENT_LABELS, isIsometricExercise } from '@/types/workout';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { toggleExerciseMuscleGroup, toggleExerciseMovementPattern, setExerciseSearchQuery, clearExerciseFilters } from '@/store/slices/uiSlice';
+import { openExerciseCreator, toggleExerciseMuscleGroup, toggleExerciseMovementPattern, setExerciseSearchQuery, clearExerciseFilters } from '@/store/slices/uiSlice';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -20,10 +20,13 @@ export default function Exercises() {
   const { muscleGroups, movementPatterns, searchQuery } = useAppSelector(state => state.ui.exerciseFilters);
   const [showFilters, setShowFilters] = useState(false);
   
+  const [showPresetsOnly, setShowPresetsOnly] = useState<boolean | undefined>(undefined);
+  
   const { data: exercises = [], isLoading } = useGetExercisesQuery({
     muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
     movementPatterns: movementPatterns.length > 0 ? movementPatterns : undefined,
     search: searchQuery || undefined,
+    showPresetsOnly: showPresetsOnly,
   });
   
   const { data: activeWorkout } = useGetActiveWorkoutQuery();
@@ -66,9 +69,17 @@ export default function Exercises() {
     <div className="min-h-screen bg-background">
       <div className="p-4 space-y-4 max-w-lg mx-auto pb-24">
         {/* Header */}
-        <header className="pt-6">
-          <h1 className="text-2xl font-bold mb-1">Exercise Library</h1>
-          <p className="text-muted-foreground">{exercises.length} exercises available</p>
+        <header className="pt-6 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Exercise Library</h1>
+            <p className="text-muted-foreground">{exercises.length} exercises available</p>
+          </div>
+          <Link to="/exercises/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create New
+            </Button>
+          </Link>
         </header>
 
         {/* Search and Filter */}
@@ -107,6 +118,36 @@ export default function Exercises() {
               </SheetHeader>
               
               <div className="mt-6 space-y-6">
+                {/* Preset/Custom Filter */}
+                <div>
+                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Type</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setShowPresetsOnly(undefined)}
+                      className={cn(
+                        showPresetsOnly === undefined ? 'tag-pill-active' : 'tag-pill-inactive'
+                      )}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setShowPresetsOnly(true)}
+                      className={cn(
+                        showPresetsOnly === true ? 'tag-pill-active' : 'tag-pill-inactive'
+                      )}
+                    >
+                      Preset
+                    </button>
+                    <button
+                      onClick={() => setShowPresetsOnly(false)}
+                      className={cn(
+                        showPresetsOnly === false ? 'tag-pill-active' : 'tag-pill-inactive'
+                      )}
+                    >
+                      Custom
+                    </button>
+                  </div>
+                </div>
                 {/* Muscle Groups */}
                 <div>
                   <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Muscle Groups</h3>

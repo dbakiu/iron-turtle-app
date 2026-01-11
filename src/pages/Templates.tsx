@@ -56,9 +56,17 @@ export default function Templates() {
     <div className="min-h-screen bg-background">
       <div className="p-4 space-y-6 max-w-lg mx-auto pb-24">
         {/* Header */}
-        <header className="pt-6">
-          <h1 className="text-2xl font-bold mb-1">Templates</h1>
-          <p className="text-muted-foreground">Start from a saved workout</p>
+        <header className="pt-6 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Templates</h1>
+            <p className="text-muted-foreground">Start from a saved workout</p>
+          </div>
+          <Link to="/templates/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create New
+            </Button>
+          </Link>
         </header>
 
         {/* Tag Filter Bar */}
@@ -88,10 +96,12 @@ export default function Templates() {
                 <Dumbbell className="w-8 h-8 text-muted-foreground" />
               </div>
               <p className="text-muted-foreground mb-4">No templates found</p>
-              <Button variant="outline">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Template
-              </Button>
+              <Link to="/templates/new">
+                <Button variant="outline">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Template
+                </Button>
+              </Link>
             </div>
           ) : (
             templates.map((template) => (
@@ -103,6 +113,15 @@ export default function Templates() {
                       <p className="text-sm text-muted-foreground">{template.description}</p>
                     )}
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleStartFromTemplate(template.id, template.name)}
+                    disabled={!!activeWorkout}
+                    className="shrink-0"
+                  >
+                    <Play className="w-5 h-5" />
+                  </Button>
                 </div>
 
                 {/* Tags */}
@@ -135,13 +154,7 @@ export default function Templates() {
           )}
         </section>
 
-        {/* Create New Template */}
-        {templates.length > 0 && (
-          <Button variant="outline" className="w-full border-dashed">
-            <Plus className="w-4 h-4 mr-2" />
-            Create New Template
-          </Button>
-        )}
+
       </div>
 
       {/* Bottom Nav */}

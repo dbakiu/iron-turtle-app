@@ -10,6 +10,8 @@ import Templates from "./pages/Templates";
 import ActiveWorkout from "./pages/ActiveWorkout";
 import Exercises from "./pages/Exercises";
 import NotFound from "./pages/NotFound";
+import { ExerciseCreator } from './pages/ExerciseCreator';
+import TemplateCreator from './pages/TemplateCreator';
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/templates" element={<Templates />} />
             <Route path="/workout/active" element={<ActiveWorkout />} />
             <Route path="/exercises" element={<Exercises />} />
+            <Route path="/exercises/new" element={<ExerciseCreator />} />
+            <Route path="/templates/new" element={<TemplateCreator />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

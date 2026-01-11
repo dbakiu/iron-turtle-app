@@ -23,8 +23,6 @@ interface RestTimerState {
 }
 
 interface OverlaysState {
-  exerciseCreator: boolean;
-  templateCreator: boolean;
   exerciseSelector: boolean;
   exerciseSwap: { isOpen: boolean; exerciseId: string | null };
 }
@@ -55,8 +53,6 @@ const initialState: UiState = {
     defaultDuration: 60,
   },
   overlays: {
-    exerciseCreator: false,
-    templateCreator: false,
     exerciseSelector: false,
     exerciseSwap: { isOpen: false, exerciseId: null },
   },
@@ -161,18 +157,6 @@ const uiSlice = createSlice({
     },
     
     // Overlays
-    openExerciseCreator: (state) => {
-      state.overlays.exerciseCreator = true;
-    },
-    closeExerciseCreator: (state) => {
-      state.overlays.exerciseCreator = false;
-    },
-    openTemplateCreator: (state) => {
-      state.overlays.templateCreator = true;
-    },
-    closeTemplateCreator: (state) => {
-      state.overlays.templateCreator = false;
-    },
     openExerciseSelector: (state) => {
       state.overlays.exerciseSelector = true;
     },
@@ -215,10 +199,6 @@ export const {
   stopRestTimer,
   addRestTime,
   setDefaultRestDuration,
-  openExerciseCreator,
-  closeExerciseCreator,
-  openTemplateCreator,
-  closeTemplateCreator,
   openExerciseSelector,
   closeExerciseSelector,
   openExerciseSwap,
