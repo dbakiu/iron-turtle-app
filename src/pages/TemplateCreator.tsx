@@ -1,26 +1,39 @@
-import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, Dumbbell, Play, Plus, X, GripVertical } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  ChevronLeft,
+  Dumbbell,
+  Play,
+  Plus,
+  X,
+  GripVertical,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCreateTemplateMutation } from '@/store/api/templateApi';
-import { Exercise, WorkoutTemplate, TemplateTag, TEMPLATE_TAG_LABELS, TemplateExercise } from '@/types/workout';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import { ExerciseSelector } from '@/components/selectors/ExerciseSelector';
-import { TemplateExerciseConfig } from '@/components/forms/TemplateExerciseConfig';
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useCreateTemplateMutation } from "@/store/api/templateApi";
+import {
+  Exercise,
+  WorkoutTemplate,
+  TemplateTag,
+  TEMPLATE_TAG_LABELS,
+  TemplateExercise,
+} from "@/types/workout";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { ExerciseSelector } from "@/components/selectors/ExerciseSelector";
+import { TemplateExerciseConfig } from "@/components/forms/TemplateExerciseConfig";
 import {
   DndContext,
   closestCenter,
@@ -29,20 +42,29 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   arrayMove,
   useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-const templateTags: TemplateTag[] = ['PUSH', 'PULL', 'LEGS', 'UPPER', 'LOWER', 'FULL_BODY', 'ARMS', 'CORE'];
+const templateTags: TemplateTag[] = [
+  "PUSH",
+  "PULL",
+  "LEGS",
+  "UPPER",
+  "LOWER",
+  "FULL_BODY",
+  "ARMS",
+  "CORE",
+];
 
 const templateSchema = z.object({
-  name: z.string().min(1, 'Template name is required'),
+  name: z.string().min(1, "Template name is required"),
   description: z.string().optional(),
   tags: z.array(z.enum(templateTags)).optional(),
 });
@@ -56,7 +78,11 @@ interface SortableExerciseProps {
   onRemove: () => void;
 }
 
-function SortableExercise({ templateEx, onConfigChange, onRemove }: SortableExerciseProps) {
+function SortableExercise({
+  templateEx,
+  onConfigChange,
+  onRemove,
+}: SortableExerciseProps) {
   const {
     attributes,
     listeners,
@@ -70,15 +96,25 @@ function SortableExercise({ templateEx, onConfigChange, onRemove }: SortableExer
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 10 : 0,
-    position: 'relative',
+    position: "relative",
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={cn(isDragging && 'shadow-lg')}>
-      <div className="absolute top-0 left-0 bottom-0 w-8 flex items-center justify-center cursor-grab touch-action-none" {...listeners} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(isDragging && "shadow-lg")}
+    >
+      <div
+        className="absolute top-0 left-0 bottom-0 w-8 flex items-center justify-center cursor-grab touch-action-none"
+        {...listeners}
+        {...attributes}
+      >
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
-      <div className="pl-8"> {/* Add padding to make space for the drag handle */}
+      <div className="pl-8">
+        {" "}
+        {/* Add padding to make space for the drag handle */}
         <TemplateExerciseConfig
           exercise={templateEx.exercise}
           initialConfig={templateEx}
@@ -94,14 +130,16 @@ export default function TemplateCreator() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [createTemplate, { isLoading }] = useCreateTemplateMutation();
-  const [selectedExercises, setSelectedExercises] = useState<TemplateExercise[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<
+    TemplateExercise[]
+  >([]);
   const [isExerciseSelectorOpen, setIsExerciseSelectorOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const {
@@ -118,73 +156,86 @@ export default function TemplateCreator() {
   const onSubmit = async (data: TemplateFormData) => {
     if (selectedExercises.length === 0) {
       toast({
-        title: 'Validation Error',
-        description: 'Please add at least one exercise to the template.',
-        variant: 'destructive',
+        title: "Validation Error",
+        description: "Please add at least one exercise to the template.",
+        variant: "destructive",
       });
       return;
     }
 
-    const newTemplate: Omit<WorkoutTemplate, 'id' | 'exercises'> = {
+    const newTemplate: Omit<WorkoutTemplate, "id" | "exercises"> = {
       ...data,
       tags: data.tags || [],
     };
 
     try {
       // Ensure exercises have correct order before sending to API
-      const exercisesWithOrder = selectedExercises.map((ex, index) => ({ ...ex, order: index }));
-      await createTemplate({ ...newTemplate, exercises: exercisesWithOrder }).unwrap();
+      const exercisesWithOrder = selectedExercises.map((ex, index) => ({
+        ...ex,
+        order: index,
+      }));
+      await createTemplate({
+        ...newTemplate,
+        exercises: exercisesWithOrder,
+      }).unwrap();
       toast({
-        title: 'Template created',
+        title: "Template created",
         description: `${data.name} has been added to your templates.`,
       });
-      navigate('/templates');
+      navigate("/templates");
     } catch (error) {
       toast({
-        title: 'Error creating template',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
+        title: "Error creating template",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleExerciseSelection = (exercises: Exercise[]) => {
-    const newExercises: TemplateExercise[] = exercises.map(newEx => {
-      const existingConfig = selectedExercises.find(selEx => selEx.exercise_id === newEx.id);
-      if (existingConfig) {
-        return existingConfig;
-      }
-      return {
-        exercise_id: newEx.id,
-        exercise: newEx,
-        default_sets: 3, // Default values
-        default_reps: 10, // Default values
-        default_set_types: ['WORKING'], // Default to one working set
-        order: 0, // Temporarily 0, will be re-indexed after merge
-      };
-    });
+  const handleExerciseSelection = (exercisesFromSelector: Exercise[]) => {
+    const updatedExercises: TemplateExercise[] = exercisesFromSelector.map(
+      (newEx) => {
+        const existingConfig = selectedExercises.find(
+          (selEx) => selEx.exercise_id === newEx.id,
+        );
+        if (existingConfig) {
+          return existingConfig;
+        }
+        return {
+          exercise_id: newEx.id,
+          exercise: newEx,
+          default_sets: 3, // Default values
+          default_reps: Array(3).fill(10), // Initialize with an array of 3 sets, each with 10 reps
+          default_set_types: Array(3).fill("WORKING"), // Default to three working sets
+          order: 0, // Temporarily 0, will be re-indexed after merge
+        };
+      },
+    );
 
-    // Filter out exercises that were deselected
-    const filteredSelected = selectedExercises.filter(selEx => newExercises.some(newEx => newEx.exercise_id === selEx.exercise_id));
-
-    // Add new exercises that weren't previously selected
-    const newlyAdded = newExercises.filter(newEx => !filteredSelected.some(selEx => selEx.exercise_id === newEx.exercise_id));
-    
-    const mergedExercises = [...filteredSelected, ...newlyAdded];
-    
     // Re-index after merge to maintain correct order
-    setSelectedExercises(mergedExercises.map((ex, index) => ({ ...ex, order: index })));
+    setSelectedExercises(
+      updatedExercises.map((ex, index) => ({ ...ex, order: index })),
+    );
     setIsExerciseSelectorOpen(false);
   };
 
-  const handleExerciseConfigChange = (exerciseId: string, config: Partial<TemplateExercise>) => {
-    setSelectedExercises(prev => prev.map(ex =>
-      ex.exercise_id === exerciseId ? { ...ex, ...config } : ex
-    ));
+  const handleExerciseConfigChange = (
+    exerciseId: string,
+    config: Partial<TemplateExercise>,
+  ) => {
+    setSelectedExercises((prev) =>
+      prev.map((ex) =>
+        ex.exercise_id === exerciseId ? { ...ex, ...config } : ex,
+      ),
+    );
   };
 
   const handleRemoveExercise = (exerciseId: string) => {
-    setSelectedExercises(prev => prev.filter(ex => ex.exercise_id !== exerciseId).map((ex, index) => ({...ex, order: index})));
+    setSelectedExercises((prev) =>
+      prev
+        .filter((ex) => ex.exercise_id !== exerciseId)
+        .map((ex, index) => ({ ...ex, order: index })),
+    );
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -192,20 +243,33 @@ export default function TemplateCreator() {
 
     if (active.id !== over?.id) {
       setSelectedExercises((items) => {
-        const oldIndex = items.findIndex(item => item.exercise_id === active.id);
-        const newIndex = items.findIndex(item => item.exercise_id === over?.id);
+        const oldIndex = items.findIndex(
+          (item) => item.exercise_id === active.id,
+        );
+        const newIndex = items.findIndex(
+          (item) => item.exercise_id === over?.id,
+        );
         const newOrder = arrayMove(items, oldIndex, newIndex);
         return newOrder.map((item, index) => ({ ...item, order: index }));
       });
     }
   };
 
+  const initialSelectedExerciseIds = useMemo(
+    () => selectedExercises.map((ex) => ex.exercise_id),
+    [selectedExercises],
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="p-4 space-y-4 max-w-lg mx-auto pb-24">
         <header className="pt-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Create Template</h1>
-          <Button variant="ghost" size="icon" onClick={() => navigate('/templates')}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/templates")}
+          >
             <ChevronLeft className="w-5 h-5" />
           </Button>
         </header>
@@ -213,18 +277,29 @@ export default function TemplateCreator() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+            <label htmlFor="name" className="block text-sm font-medium mb-1">
+              Name
+            </label>
             <Controller
               name="name"
               control={control}
               render={({ field }) => <Input {...field} id="name" />}
             />
-            {errors.name && <p className="text-destructive text-sm mt-1">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-destructive text-sm mt-1">
+                {errors.name.message}
+              </p>
+            )}
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium mb-1"
+            >
+              Description
+            </label>
             <Controller
               name="description"
               control={control}
@@ -251,7 +326,9 @@ export default function TemplateCreator() {
                         field.onChange(newValue);
                       }}
                       className={cn(
-                        field.value?.includes(tag) ? 'tag-pill-active' : 'tag-pill-inactive'
+                        field.value?.includes(tag)
+                          ? "tag-pill-active"
+                          : "tag-pill-inactive",
                       )}
                     >
                       {TEMPLATE_TAG_LABELS[tag]}
@@ -270,13 +347,13 @@ export default function TemplateCreator() {
                 No exercises selected.
               </div>
             ) : (
-              <DndContext 
+              <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
               >
-                <SortableContext 
-                  items={selectedExercises.map(ex => ex.exercise_id)}
+                <SortableContext
+                  items={selectedExercises.map((ex) => ex.exercise_id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-2">
@@ -284,15 +361,27 @@ export default function TemplateCreator() {
                       <SortableExercise
                         key={templateEx.exercise_id}
                         templateEx={templateEx}
-                        onConfigChange={(config) => handleExerciseConfigChange(templateEx.exercise_id, config)}
-                        onRemove={() => handleRemoveExercise(templateEx.exercise_id)}
+                        onConfigChange={(config) =>
+                          handleExerciseConfigChange(
+                            templateEx.exercise_id,
+                            config,
+                          )
+                        }
+                        onRemove={() =>
+                          handleRemoveExercise(templateEx.exercise_id)
+                        }
                       />
                     ))}
                   </div>
                 </SortableContext>
               </DndContext>
             )}
-            <Button type="button" variant="outline" className="w-full border-dashed mt-3" onClick={() => setIsExerciseSelectorOpen(true)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-dashed mt-3"
+              onClick={() => setIsExerciseSelectorOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Exercise
             </Button>
@@ -300,7 +389,7 @@ export default function TemplateCreator() {
 
           <div className="flex justify-end pt-4">
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Create Template'}
+              {isLoading ? "Saving..." : "Create Template"}
             </Button>
           </div>
         </form>
@@ -311,7 +400,7 @@ export default function TemplateCreator() {
         <ExerciseSelector
           onSelect={handleExerciseSelection}
           onClose={() => setIsExerciseSelectorOpen(false)}
-          initialSelectedExerciseIds={selectedExercises.map(ex => ex.exercise_id)}
+          initialSelectedExerciseIds={initialSelectedExerciseIds}
         />
       )}
     </div>

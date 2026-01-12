@@ -1,9 +1,15 @@
-import { useState, useMemo } from 'react';
-import { Search, Filter, Plus, X, ArrowLeft, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useState, useMemo, useEffect, useRef } from "react"; // Ensure useRef is imported
+import { Search, Filter, Plus, X, ArrowLeft, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Exercise,
   PrimaryMuscleGroup,
@@ -12,17 +18,17 @@ import {
   PRIMARY_MUSCLE_GROUP_LABELS,
   MOVEMENT_PATTERN_LABELS,
   EQUIPMENT_LABELS,
-} from '@/types/workout';
-import { useGetExercisesQuery } from '@/store/api/exerciseApi';
-import { useAppDispatch, useAppSelector } from '@/store';
+} from "@/types/workout";
+import { useGetExercisesQuery } from "@/store/api/exerciseApi";
+import { useAppDispatch, useAppSelector } from "@/store";
 import {
   setExerciseSearchQuery,
   toggleExerciseMuscleGroup,
   toggleExerciseMovementPattern,
   toggleExerciseEquipment,
   clearExerciseFilters,
-} from '@/store/slices/uiSlice';
-import { cn } from '@/lib/utils';
+} from "@/store/slices/uiSlice";
+import { cn } from "@/lib/utils";
 
 interface ExerciseSelectorProps {
   onSelect: (exercises: Exercise[]) => void;
@@ -30,34 +36,83 @@ interface ExerciseSelectorProps {
   initialSelectedExerciseIds?: string[];
 }
 
-export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds = [] }: ExerciseSelectorProps) {
+export function ExerciseSelector({
+  onSelect,
+  onClose,
+  initialSelectedExerciseIds = [],
+}: ExerciseSelectorProps) {
   const dispatch = useAppDispatch();
-  const { muscleGroups, movementPatterns, equipment, searchQuery } = useAppSelector(state => state.ui.exerciseFilters);
+  const { muscleGroups, movementPatterns, equipment, searchQuery } =
+    useAppSelector((state) => state.ui.exerciseFilters);
   const [showFilters, setShowFilters] = useState(false);
-  const [showPresetsOnly, setShowPresetsOnly] = useState<boolean | undefined>(undefined);
-  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+  const [showPresetsOnly, setShowPresetsOnly] = useState<boolean | undefined>(
+    undefined,
+  );
 
-  const { data: exercises = [], isLoading } = useGetExercisesQuery({
+  // Fetch exercises from API - placed at the top of the function
+  const { data: apiExercises, isLoading } = useGetExercisesQuery({
     muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
-    movementPatterns: movementPatterns.length > 0 ? movementPatterns : undefined,
+    movementPatterns:
+      movementPatterns.length > 0 ? movementPatterns : undefined,
     equipment: equipment.length > 0 ? equipment : undefined,
     search: searchQuery || undefined,
     showPresetsOnly: showPresetsOnly,
   });
 
-  // Initialize selected exercises if provided
-  useMemo(() => {
-    if (exercises.length > 0 && initialSelectedExerciseIds.length > 0) {
-      const initialSelection = exercises.filter(ex => initialSelectedExerciseIds.includes(ex.id));
-      setSelectedExercises(initialSelection);
+  // Ensure 'exercises' is always an array for local use (even when apiExercises is undefined during loading)
+  const exercises = useMemo(() => apiExercises || [], [apiExercises]);
+
+  // Local state for selected exercises within the selector
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+  // Ref to track if selectedExercises has been initialized from initialSelectedExerciseIds
+  const hasInitializedFromProps = useRef(false);
+
+  // Effect to synchronize selectedExercises with initialSelectedExerciseIds when data becomes available or initial IDs change
+  useEffect(() => {
+    // Only proceed if exercises data is still loading or not available as an array
+    if (isLoading || !exercises || !Array.isArray(exercises)) {
+      return;
     }
-  }, [exercises, initialSelectedExerciseIds]);
+
+    // If initialSelectedExerciseIds are empty, ensure local selectedExercises is also empty
+    // This condition runs only once per meaningful change.
+    if (initialSelectedExerciseIds.length === 0) {
+      if (selectedExercises.length > 0 || !hasInitializedFromProps.current) {
+        // Only update if needed or if it's the first time
+        setSelectedExercises([]);
+      }
+      hasInitializedFromProps.current = true; // Mark as initialized (empty selection handled)
+      return;
+    }
+
+    // This condition checks if the current selection accurately reflects the initialSelectedExerciseIds
+    // It prevents re-initializing if user has already made selections locally via handleToggleExercise.
+    const currentSelectedIdSet = new Set(selectedExercises.map((ex) => ex.id));
+    const initialIdsMatch =
+      initialSelectedExerciseIds.length === selectedExercises.length &&
+      initialSelectedExerciseIds.every((id) => currentSelectedIdSet.has(id));
+
+    if (!hasInitializedFromProps.current || !initialIdsMatch) {
+      const initialSelection = exercises.filter((ex) =>
+        initialSelectedExerciseIds.includes(ex.id),
+      );
+      setSelectedExercises(initialSelection);
+      hasInitializedFromProps.current = true; // Mark as initialized
+    }
+  }, [exercises, initialSelectedExerciseIds, isLoading]);
+
+  // Reset initialization flag when the selector component's key prop changes or the component effectively remounts
+  // This is a safety net if component's life cycle is complex.
+  // The fact that it's mounted/unmounted by `isExerciseSelectorOpen` makes hasInitializedFromProps.current = false;
+  // at component construction work. So this useEffect to reset the ref is actually not necessary.
 
   const handleToggleExercise = (exercise: Exercise) => {
-    setSelectedExercises(prev =>
-      prev.find(ex => ex.id === exercise.id)
-        ? prev.filter(ex => ex.id !== exercise.id)
-        : [...prev, exercise]
+    // When user toggles, we assume the local state is authoritative.
+    // No need to reset hasInitializedFromProps.current here as useEffect should correctly re-evaluate.
+    setSelectedExercises((prev) =>
+      prev.find((ex) => ex.id === exercise.id)
+        ? prev.filter((ex) => ex.id !== exercise.id)
+        : [...prev, exercise],
     );
   };
 
@@ -66,7 +121,11 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
     onClose();
   };
 
-  const activeFiltersCount = muscleGroups.length + movementPatterns.length + equipment.length + (showPresetsOnly !== undefined ? 1 : 0);
+  const activeFiltersCount =
+    muscleGroups.length +
+    movementPatterns.length +
+    equipment.length +
+    (showPresetsOnly !== undefined ? 1 : 0);
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
@@ -76,7 +135,10 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h2 className="text-lg font-semibold">Select Exercises</h2>
-          <Button onClick={handleDone} disabled={selectedExercises.length === 0}>
+          <Button
+            onClick={handleDone}
+            disabled={selectedExercises.length === 0}
+          >
             <Check className="w-5 h-5 mr-2" />
             Done ({selectedExercises.length})
           </Button>
@@ -90,11 +152,13 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
               <Input
                 placeholder="Search exercises..."
                 value={searchQuery}
-                onChange={(e) => dispatch(setExerciseSearchQuery(e.target.value))}
+                onChange={(e) =>
+                  dispatch(setExerciseSearchQuery(e.target.value))
+                }
                 className="pl-10"
               />
             </div>
-            
+
             <Sheet open={showFilters} onOpenChange={setShowFilters}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="relative">
@@ -111,22 +175,30 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                   <SheetTitle className="flex items-center justify-between">
                     <span>Filters</span>
                     {activeFiltersCount > 0 && (
-                      <Button variant="ghost" size="sm" onClick={() => dispatch(clearExerciseFilters())}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => dispatch(clearExerciseFilters())}
+                      >
                         Clear all
                       </Button>
                     )}
                   </SheetTitle>
                 </SheetHeader>
-                
+
                 <div className="mt-6 space-y-6">
                   {/* Preset/Custom Filter */}
                   <div>
-                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Type</h3>
+                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                      Type
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setShowPresetsOnly(undefined)}
                         className={cn(
-                          showPresetsOnly === undefined ? 'tag-pill-active' : 'tag-pill-inactive'
+                          showPresetsOnly === undefined
+                            ? "tag-pill-active"
+                            : "tag-pill-inactive",
                         )}
                       >
                         All
@@ -134,7 +206,9 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                       <button
                         onClick={() => setShowPresetsOnly(true)}
                         className={cn(
-                          showPresetsOnly === true ? 'tag-pill-active' : 'tag-pill-inactive'
+                          showPresetsOnly === true
+                            ? "tag-pill-active"
+                            : "tag-pill-inactive",
                         )}
                       >
                         Preset
@@ -142,7 +216,9 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                       <button
                         onClick={() => setShowPresetsOnly(false)}
                         className={cn(
-                          showPresetsOnly === false ? 'tag-pill-active' : 'tag-pill-inactive'
+                          showPresetsOnly === false
+                            ? "tag-pill-active"
+                            : "tag-pill-inactive",
                         )}
                       >
                         Custom
@@ -151,14 +227,24 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                   </div>
                   {/* Muscle Groups */}
                   <div>
-                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Muscle Groups</h3>
+                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                      Muscle Groups
+                    </h3>
                     <div className="flex flex-wrap gap-2">
-                      {(Object.keys(PRIMARY_MUSCLE_GROUP_LABELS) as PrimaryMuscleGroup[]).map((muscle) => (
+                      {(
+                        Object.keys(
+                          PRIMARY_MUSCLE_GROUP_LABELS,
+                        ) as PrimaryMuscleGroup[]
+                      ).map((muscle) => (
                         <button
                           key={muscle}
-                          onClick={() => dispatch(toggleExerciseMuscleGroup(muscle))}
+                          onClick={() =>
+                            dispatch(toggleExerciseMuscleGroup(muscle))
+                          }
                           className={cn(
-                            muscleGroups.includes(muscle) ? 'tag-pill-active' : 'tag-pill-inactive'
+                            muscleGroups.includes(muscle)
+                              ? "tag-pill-active"
+                              : "tag-pill-inactive",
                           )}
                         >
                           {PRIMARY_MUSCLE_GROUP_LABELS[muscle]}
@@ -169,14 +255,24 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
 
                   {/* Movement Patterns */}
                   <div>
-                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Movement Patterns</h3>
+                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                      Movement Patterns
+                    </h3>
                     <div className="flex flex-wrap gap-2">
-                      {(Object.keys(MOVEMENT_PATTERN_LABELS) as MovementPattern[]).map((pattern) => (
+                      {(
+                        Object.keys(
+                          MOVEMENT_PATTERN_LABELS,
+                        ) as MovementPattern[]
+                      ).map((pattern) => (
                         <button
                           key={pattern}
-                          onClick={() => dispatch(toggleExerciseMovementPattern(pattern))}
+                          onClick={() =>
+                            dispatch(toggleExerciseMovementPattern(pattern))
+                          }
                           className={cn(
-                            movementPatterns.includes(pattern) ? 'tag-pill-active' : 'tag-pill-inactive'
+                            movementPatterns.includes(pattern)
+                              ? "tag-pill-active"
+                              : "tag-pill-inactive",
                           )}
                         >
                           {MOVEMENT_PATTERN_LABELS[pattern]}
@@ -187,24 +283,32 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
 
                   {/* Equipment */}
                   <div>
-                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Equipment</h3>
+                    <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                      Equipment
+                    </h3>
                     <div className="flex flex-wrap gap-2">
-                      {(Object.keys(EQUIPMENT_LABELS) as Equipment[]).map((eq) => (
-                        <button
-                          key={eq}
-                          onClick={() => dispatch(toggleExerciseEquipment(eq))}
-                          className={cn(
-                            equipment.includes(eq) ? 'tag-pill-active' : 'tag-pill-inactive'
-                          )}
-                        >
-                          {EQUIPMENT_LABELS[eq]}
-                        </button>
-                      ))}
+                      {(Object.keys(EQUIPMENT_LABELS) as Equipment[]).map(
+                        (eq) => (
+                          <button
+                            key={eq}
+                            onClick={() =>
+                              dispatch(toggleExerciseEquipment(eq))
+                            }
+                            className={cn(
+                              equipment.includes(eq)
+                                ? "tag-pill-active"
+                                : "tag-pill-inactive",
+                            )}
+                          >
+                            {EQUIPMENT_LABELS[eq]}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </div>
 
-                  <Button 
-                    className="w-full" 
+                  <Button
+                    className="w-full"
                     onClick={() => setShowFilters(false)}
                   >
                     Apply Filters
@@ -218,8 +322,8 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
           {activeFiltersCount > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {muscleGroups.map((muscle) => (
-                <Badge 
-                  key={muscle} 
+                <Badge
+                  key={muscle}
                   variant="secondary"
                   className="cursor-pointer"
                   onClick={() => dispatch(toggleExerciseMuscleGroup(muscle))}
@@ -229,19 +333,21 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                 </Badge>
               ))}
               {movementPatterns.map((pattern) => (
-                <Badge 
-                  key={pattern} 
+                <Badge
+                  key={pattern}
                   variant="secondary"
                   className="cursor-pointer"
-                  onClick={() => dispatch(toggleExerciseMovementPattern(pattern))}
+                  onClick={() =>
+                    dispatch(toggleExerciseMovementPattern(pattern))
+                  }
                 >
                   {MOVEMENT_PATTERN_LABELS[pattern]}
                   <X className="w-3 h-3 ml-1" />
                 </Badge>
               ))}
               {equipment.map((eq) => (
-                <Badge 
-                  key={eq} 
+                <Badge
+                  key={eq}
                   variant="secondary"
                   className="cursor-pointer"
                   onClick={() => dispatch(toggleExerciseEquipment(eq))}
@@ -251,12 +357,12 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                 </Badge>
               ))}
               {showPresetsOnly !== undefined && (
-                <Badge 
+                <Badge
                   variant="secondary"
                   className="cursor-pointer"
                   onClick={() => setShowPresetsOnly(undefined)}
                 >
-                  {showPresetsOnly ? 'Preset Only' : 'Custom Only'}
+                  {showPresetsOnly ? "Preset Only" : "Custom Only"}
                   <X className="w-3 h-3 ml-1" />
                 </Badge>
               )}
@@ -272,27 +378,34 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
             ) : exercises.length === 0 ? (
               <div className="stat-card text-center py-12">
                 <p className="text-muted-foreground">No exercises found</p>
-                <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Try adjusting your filters
+                </p>
               </div>
             ) : (
               exercises.map((exercise) => (
-                <div 
-                  key={exercise.id} 
+                <div
+                  key={exercise.id}
                   className={cn(
                     "stat-card hover:bg-accent/30 transition-colors cursor-pointer",
-                    selectedExercises.find(ex => ex.id === exercise.id) && "bg-primary/20"
+                    selectedExercises.find((ex) => ex.id === exercise.id) &&
+                      "bg-primary/20",
                   )}
                   onClick={() => handleToggleExercise(exercise)}
                 >
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{exercise.name}</h3>
-                    {selectedExercises.find(ex => ex.id === exercise.id) && (
+                    {selectedExercises.find((ex) => ex.id === exercise.id) && (
                       <Check className="w-5 h-5 text-primary" />
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
-                      {PRIMARY_MUSCLE_GROUP_LABELS[exercise.primary_muscle_group]}
+                      {
+                        PRIMARY_MUSCLE_GROUP_LABELS[
+                          exercise.primary_muscle_group
+                        ]
+                      }
                     </span>
                     {exercise.movement_pattern && (
                       <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
@@ -300,7 +413,9 @@ export function ExerciseSelector({ onSelect, onClose, initialSelectedExerciseIds
                       </span>
                     )}
                     <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
-                      {exercise.equipment.map(e => EQUIPMENT_LABELS[e]).join(', ')}
+                      {exercise.equipment
+                        .map((e) => EQUIPMENT_LABELS[e])
+                        .join(", ")}
                     </span>
                   </div>
                 </div>

@@ -19,7 +19,7 @@ interface TemplateExerciseConfigProps {
   onRemove: () => void;
 }
 
-const allSetTypes: SetType[] = ['WARMUP', 'WORKING', 'MYOREP', 'FAILURE'];
+const allSetTypes: SetType[] = ['WARMUP', 'WORKING', 'MYOREP', 'FAILURE', 'AMRAP'];
 
 export function TemplateExerciseConfig({
   exercise,
@@ -28,24 +28,26 @@ export function TemplateExerciseConfig({
   onRemove,
 }: TemplateExerciseConfigProps) {
   const [defaultSets, setDefaultSets] = useState(initialConfig.default_sets || 3);
-  const [defaultReps, setDefaultReps] = useState<string>(
-    initialConfig.default_reps ? initialConfig.default_reps.toString() : '10'
+  const [defaultReps, setDefaultReps] = useState<string[]>(
+    (initialConfig.default_reps as (number | { min: number; max: number })[] ||
+     Array(initialConfig.default_sets || 3).fill(10)).map(r => typeof r === 'number' ? r.toString() : '10')
   );
-  const [defaultSetTypes, setDefaultSetTypes] = useState<SetType[]>(initialConfig.default_set_types || ['WORKING']);
+  const [defaultSetTypes, setDefaultSetTypes] = useState<SetType[]>(initialConfig.default_set_types || Array(initialConfig.default_sets || 3).fill('WORKING'));
 
   useEffect(() => {
     onConfigChange({
       default_sets: defaultSets,
-      default_reps: parseInt(defaultReps) || 0, // Simplified for now, handle ranges later
+      default_reps: defaultReps.map(r => parseInt(r) || 0), // Map string array to number array
       default_set_types: defaultSetTypes,
     });
-  }, [defaultSets, defaultReps, defaultSetTypes]);
+  }, [defaultSets, defaultReps, defaultSetTypes, onConfigChange]); // Added onConfigChange to dependency array
 
-  const handleRepsChange = (value: string) => {
-    // Basic validation for numbers
-    if (value === '' || /^\d+$/.test(value)) {
-      setDefaultReps(value);
-    }
+  const handleRepsChange = (index: number, value: string) => {
+    setDefaultReps(prev => {
+      const newReps = [...prev];
+      newReps[index] = value; // Allow any input, it will be parsed onBlur
+      return newReps;
+    });
   };
 
   const handleSetTypeChange = (index: number, newType: SetType) => {
@@ -56,12 +58,14 @@ export function TemplateExerciseConfig({
 
   const addSet = () => {
     setDefaultSetTypes(prev => [...prev, 'WORKING']);
+    setDefaultReps(prev => [...prev, '10']); // Add a default rep value for the new set
     setDefaultSets(prev => prev + 1);
   };
 
   const removeSet = (index: number) => {
     if (defaultSets > 1) {
       setDefaultSetTypes(prev => prev.filter((_, i) => i !== index));
+      setDefaultReps(prev => prev.filter((_, i) => i !== index)); // Remove rep value for the set
       setDefaultSets(prev => prev - 1);
     }
   };
@@ -96,10 +100,11 @@ export function TemplateExerciseConfig({
 
             <Input
               type="number"
-              value={defaultReps}
-              onChange={(e) => handleRepsChange(e.target.value)}
+              value={defaultReps[setIndex] || ''} // Use per-set rep value
+              onChange={(e) => handleRepsChange(setIndex, e.target.value)} // Pass setIndex
               className="w-20"
               placeholder="Reps"
+              min={0}
             />
             <span className="text-sm text-muted-foreground">reps</span>
             

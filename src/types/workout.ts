@@ -114,7 +114,7 @@ export interface TemplateExercise {
   exercise_id: string;
   exercise: Exercise;
   default_sets: number;
-  default_reps?: number | { min: number; max: number }; // Fixed or range
+  default_reps?: (number | { min: number; max: number })[]; // Per-set fixed or range
   default_set_types?: SetType[]; // Per-set type configuration
   order: number;
 }
