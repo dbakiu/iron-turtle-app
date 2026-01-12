@@ -126,7 +126,7 @@ export default function Dashboard() {
                     className="w-10 h-10 rounded-lg bg-chart-3/20 flex items-center justify-center"
                     style={{ borderRadius: "var(--radius)" }}
                   >
-                    <Dumbbell className="w-5 h-5 text-chart-3" />
+                    <Calendar className="w-5 h-5 text-chart-3" />
                   </div>
                   <div>
                     <p className="font-medium">Workout Templates</p>
@@ -219,7 +219,7 @@ function BottomNav() {
           <span className="text-xs font-medium">Workout</span>
         </Link>
         <Link to="/exercises" className="nav-link flex-1">
-          <Dumbbell className="w-5 h-5" />
+          <Book className="w-5 h-5" />
           <span className="text-xs font-medium">Exercises</span>
         </Link>
       </div>

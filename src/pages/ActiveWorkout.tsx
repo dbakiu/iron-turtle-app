@@ -421,9 +421,6 @@ export default function ActiveWorkout() {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="flex items-center gap-2 px-2 pb-2 mt-3 border-b border-border">
-                        <span className="w-8 text-left text-xs uppercase font-medium text-muted-foreground">
-                          #
-                        </span>
                         <span className="w-12 text-left text-xs uppercase font-medium text-muted-foreground">
                           Type
                         </span>
@@ -431,7 +428,7 @@ export default function ActiveWorkout() {
                           Weight (kg)
                         </span>
                         <span className="flex-1 text-center text-xs uppercase font-medium text-muted-foreground">
-                          Reps
+                          Reps/Seconds
                         </span>
                         <span className="w-20 text-right text-xs uppercase font-medium text-muted-foreground"></span>{" "}
                         {/* For action buttons */}
