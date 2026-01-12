@@ -114,11 +114,11 @@ export default function Templates() {
                     )}
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="icon"
                     onClick={() => handleStartFromTemplate(template.id, template.name)}
                     disabled={!!activeWorkout}
-                    className="shrink-0"
+                    className="shrink-0 border-primary"
                   >
                     <Play className="w-5 h-5 text-primary" />
                   </Button>

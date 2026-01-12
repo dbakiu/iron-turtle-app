@@ -46,7 +46,7 @@ export type Equipment =
   | 'OTHER';
 
 // Set types
-export type SetType = 'WARMUP' | 'WORKING' | 'MYOREP' | 'FAILURE';
+export type SetType = 'WARMUP' | 'WORKING' | 'MYOREP' | 'FAILURE' | 'AMRAP';
 
 // Template tags for categorization
 export type TemplateTag = 'PUSH' | 'PULL' | 'LEGS' | 'UPPER' | 'LOWER' | 'FULL_BODY' | 'ARMS' | 'CORE';
@@ -137,6 +137,7 @@ export const SET_TYPE_LABELS: Record<SetType, string> = {
   WORKING: 'R',
   MYOREP: 'M',
   FAILURE: 'F',
+  AMRAP: 'A',
 };
 
 export const SET_TYPE_NAMES: Record<SetType, string> = {
@@ -144,6 +145,7 @@ export const SET_TYPE_NAMES: Record<SetType, string> = {
   WORKING: 'Working',
   MYOREP: 'Myo-rep',
   FAILURE: 'Failure',
+  AMRAP: 'AMRAP',
 };
 
 export const PRIMARY_MUSCLE_GROUP_LABELS: Record<PrimaryMuscleGroup, string> = {

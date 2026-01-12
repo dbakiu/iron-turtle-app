@@ -44,11 +44,12 @@
   --sidebar-border: oklch(0.9280 0.0068 233.6457);
   --sidebar-ring: oklch(0.6470 0.1056 238.1248);
   
-  /* Iron Turtle Set Type Colors */
+  /* Set type colors */
   --warmup: oklch(0.7488 0.1144 85.7336);
   --working: oklch(0.6401 0.1074 240.6746);
   --myorep: oklch(0.6500 0.1400 320.0000);
   --failure: oklch(0.5866 0.1614 19.9341);
+  --amrap: oklch(0.7 0.1 270);
   
   /* Glass effects */
   --glass: oklch(0.98 0.001 0 / 0.9);
@@ -112,6 +113,7 @@
   --working: oklch(0.6401 0.1074 240.6746);
   --myorep: oklch(0.6500 0.1400 320.0000);
   --failure: oklch(0.5866 0.1614 19.9341);
+  --amrap: oklch(0.5 0.1 270);
   
   /* Glass effects - dark */
   --glass: oklch(0.16 0.008 260 / 0.9);
@@ -242,6 +244,12 @@
     @apply set-badge;
     background: oklch(from var(--failure) l c h / 0.2);
     color: var(--failure);
+  }
+
+  .set-badge-amrap {
+    @apply set-badge;
+    background: oklch(from var(--amrap) l c h / 0.2);
+    color: var(--amrap);
   }
 
   /* Numeric inputs - large columnar */

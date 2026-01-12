@@ -1,12 +1,34 @@
-import { ActiveSetRow } from '@/components/ActiveSetRow';
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Check, Clock, Dumbbell, X, Play, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useGetActiveWorkoutQuery, useStartWorkoutMutation, useFinishWorkoutMutation, useDiscardWorkoutMutation, useAddSetMutation } from '@/store/api/activeWorkoutApi';
-import { useSaveCompletedWorkoutMutation } from '@/store/api/historyApi';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { tickWorkoutDuration, resetWorkoutDuration, startRestTimer, tickRestTimer, stopRestTimer, addRestTime, setActiveExerciseId } from '@/store/slices/uiSlice';
+import { ActiveSetRow } from "@/components/ActiveSetRow";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Plus,
+  Check,
+  Clock,
+  Dumbbell,
+  X,
+  Play,
+  ChevronDown,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  useGetActiveWorkoutQuery,
+  useStartWorkoutMutation,
+  useFinishWorkoutMutation,
+  useDiscardWorkoutMutation,
+  useAddSetMutation,
+} from "@/store/api/activeWorkoutApi";
+import { useSaveCompletedWorkoutMutation } from "@/store/api/historyApi";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  tickWorkoutDuration,
+  resetWorkoutDuration,
+  startRestTimer,
+  tickRestTimer,
+  stopRestTimer,
+  addRestTime,
+  setActiveExerciseId,
+} from "@/store/slices/uiSlice";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,36 +39,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from "@/components/ui/collapsible";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function ActiveWorkout() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
-  
+
   const { data: activeWorkout, isLoading } = useGetActiveWorkoutQuery();
   const [startWorkout] = useStartWorkoutMutation();
   const [finishWorkout] = useFinishWorkoutMutation();
   const [discardWorkout] = useDiscardWorkoutMutation();
   const [saveCompletedWorkout] = useSaveCompletedWorkoutMutation();
   const [addSet] = useAddSetMutation();
-  
-  const { workoutDuration, activeExerciseId } = useAppSelector(state => state.ui);
-  const restTimer = useAppSelector(state => state.ui.restTimer);
+
+  const { workoutDuration, activeExerciseId } = useAppSelector(
+    (state) => state.ui,
+  );
+  const restTimer = useAppSelector((state) => state.ui.restTimer);
 
   // Duration timer
   useEffect(() => {
@@ -65,7 +89,7 @@ export default function ActiveWorkout() {
   // Rest timer
   useEffect(() => {
     if (!restTimer.isRunning) return;
-    
+
     const interval = setInterval(() => {
       dispatch(tickRestTimer());
     }, 1000);
@@ -74,16 +98,16 @@ export default function ActiveWorkout() {
   }, [restTimer.isRunning, dispatch]);
 
   const handleStartEmptyWorkout = async () => {
-    await startWorkout({ name: 'New Workout' });
+    await startWorkout({ name: "New Workout" });
     dispatch(resetWorkoutDuration());
   };
 
   const handleFinishWorkout = async () => {
     if (!activeWorkout) return;
-    
+
     const completedSets = activeWorkout.exercises.reduce(
-      (acc, ex) => acc + ex.sets.filter(s => s.is_completed).length,
-      0
+      (acc, ex) => acc + ex.sets.filter((s) => s.is_completed).length,
+      0,
     );
 
     if (completedSets === 0) {
@@ -96,36 +120,36 @@ export default function ActiveWorkout() {
     }
 
     const result = await finishWorkout();
-    if ('data' in result && result.data) {
+    if ("data" in result && result.data) {
       await saveCompletedWorkout(result.data);
       toast({
         title: "Workout completed! 💪",
         description: `Great job! You completed ${completedSets} sets.`,
       });
     }
-    
-    navigate('/');
+
+    navigate("/");
   };
 
   const handleDiscardWorkout = async () => {
     await discardWorkout();
-    navigate('/');
+    navigate("/");
   };
 
   const handleAddSet = (exerciseId: string) => {
-    const exercise = activeWorkout?.exercises.find(e => e.id === exerciseId);
+    const exercise = activeWorkout?.exercises.find((e) => e.id === exerciseId);
     if (!exercise) return;
 
     const lastSet = exercise.sets[exercise.sets.length - 1];
     const newSet = {
       exercise_id: exercise.exercise.id,
-      set_type: lastSet?.set_type || 'WORKING',
+      set_type: lastSet?.set_type || "WORKING",
       weight: lastSet?.weight || 0,
       reps: lastSet?.reps || 0,
       duration: lastSet?.duration,
       is_completed: false,
     };
-    
+
     addSet({ exerciseId, set: newSet });
   };
 
@@ -133,11 +157,11 @@ export default function ActiveWorkout() {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hrs > 0) {
-      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     }
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (isLoading) {
@@ -157,14 +181,16 @@ export default function ActiveWorkout() {
               <Dumbbell className="w-10 h-10 text-muted-foreground" />
             </div>
             <h2 className="text-2xl font-bold mb-2">No Active Workout</h2>
-            <p className="text-muted-foreground mb-8">Start a new workout to begin tracking your sets</p>
-            
+            <p className="text-muted-foreground mb-8">
+              Start a new workout to begin tracking your sets
+            </p>
+
             <Sheet>
               <SheetTrigger asChild>
                 <Button
                   size="lg"
                   className="w-full"
-                  style={{ borderRadius: 'var(--radius)' }}
+                  style={{ borderRadius: "var(--radius)" }}
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Start Workout
@@ -198,10 +224,13 @@ export default function ActiveWorkout() {
     );
   }
 
-  const totalSets = activeWorkout.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+  const totalSets = activeWorkout.exercises.reduce(
+    (acc, ex) => acc + ex.sets.length,
+    0,
+  );
   const completedSets = activeWorkout.exercises.reduce(
-    (acc, ex) => acc + ex.sets.filter(s => s.is_completed).length,
-    0
+    (acc, ex) => acc + ex.sets.filter((s) => s.is_completed).length,
+    0,
   );
 
   return (
@@ -213,7 +242,11 @@ export default function ActiveWorkout() {
             <h1 className="text-2xl font-bold">{activeWorkout.name}</h1>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                >
                   <X className="w-5 h-5" />
                 </Button>
               </AlertDialogTrigger>
@@ -221,28 +254,36 @@ export default function ActiveWorkout() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Discard Workout?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will discard all your progress in this workout. This action cannot be undone.
+                    This will discard all your progress in this workout. This
+                    action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDiscardWorkout} className="bg-destructive hover:bg-destructive/90">
+                  <AlertDialogAction
+                    onClick={handleDiscardWorkout}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
                     Discard
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           </div>
-          
+
           {/* Stats Bar */}
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="w-4 h-4" />
-              <span className="font-medium tabular-nums">{formatDuration(workoutDuration)}</span>
+              <span className="font-medium tabular-nums">
+                {formatDuration(workoutDuration)}
+              </span>
             </div>
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Check className="w-4 h-4" />
-              <span className="font-medium">{completedSets}/{totalSets} sets</span>
+              <span className="font-medium">
+                {completedSets}/{totalSets} sets
+              </span>
             </div>
           </div>
         </header>
@@ -251,7 +292,9 @@ export default function ActiveWorkout() {
         <div className="space-y-4">
           {activeWorkout.exercises.length === 0 ? (
             <div className="stat-card text-center py-12">
-              <p className="text-muted-foreground mb-4">No exercises added yet</p>
+              <p className="text-muted-foreground mb-4">
+                No exercises added yet
+              </p>
               <Link to="/exercises">
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
@@ -261,30 +304,56 @@ export default function ActiveWorkout() {
             </div>
           ) : (
             activeWorkout.exercises.map((workoutExercise) => {
-              const currentSetIndex = workoutExercise.sets.findIndex(s => !s.is_completed);
+              const currentSetIndex = workoutExercise.sets.findIndex(
+                (s) => !s.is_completed,
+              );
 
               return (
                 <Collapsible
                   key={workoutExercise.id}
                   open={activeExerciseId === workoutExercise.id}
                   onOpenChange={(isOpen) =>
-                    dispatch(setActiveExerciseId(isOpen ? workoutExercise.id : null))
+                    dispatch(
+                      setActiveExerciseId(isOpen ? workoutExercise.id : null),
+                    )
                   }
                 >
                   <div className="stat-card">
                     <CollapsibleTrigger className="w-full">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-left">{workoutExercise.exercise.name}</h3>
+                        <div>
+                          <h3 className="font-semibold text-left">{workoutExercise.exercise.name}</h3>
+                          {workoutExercise.exercise.primary_muscle_group && (
+                            <p className="text-xs text-muted-foreground capitalize">{workoutExercise.exercise.primary_muscle_group.toLowerCase().replace(/_/g, ' ')}</p>
+                          )}
+                        </div>
                         <ChevronDown
                           className={cn(
-                            'w-5 h-5 text-muted-foreground transition-transform',
-                            activeExerciseId === workoutExercise.id && 'rotate-180'
+                            "w-5 h-5 text-muted-foreground transition-transform",
+                            activeExerciseId === workoutExercise.id &&
+                              "rotate-180",
                           )}
                         />
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <div className="space-y-2 mt-3">
+                      <div className="flex items-center gap-2 px-2 pb-2 mt-3 border-b border-border">
+                        <span className="w-8 text-left text-xs uppercase font-medium text-muted-foreground">
+                          #
+                        </span>
+                        <span className="w-12 text-left text-xs uppercase font-medium text-muted-foreground">
+                          Type
+                        </span>
+                        <span className="flex-1 text-center text-xs uppercase font-medium text-muted-foreground">
+                          Weight (kg)
+                        </span>
+                        <span className="flex-1 text-center text-xs uppercase font-medium text-muted-foreground">
+                          Reps
+                        </span>
+                        <span className="w-20 text-right text-xs uppercase font-medium text-muted-foreground"></span>{" "}
+                        {/* For action buttons */}
+                      </div>
+                      <div className="space-y-2 pt-2">
                         {workoutExercise.sets.map((set, index) => (
                           <ActiveSetRow
                             key={set.id}
@@ -292,7 +361,9 @@ export default function ActiveWorkout() {
                             exerciseId={workoutExercise.id}
                             setIndex={index}
                             isCurrent={index === currentSetIndex}
-                            isFuture={currentSetIndex !== -1 && index > currentSetIndex}
+                            isFuture={
+                              currentSetIndex !== -1 && index > currentSetIndex
+                            }
                           />
                         ))}
                         <Button
@@ -307,12 +378,10 @@ export default function ActiveWorkout() {
                     </CollapsibleContent>
                   </div>
                 </Collapsible>
-              )
+              );
             })
           )}
         </div>
-
-
       </div>
 
       {/* Rest Timer */}
@@ -321,19 +390,32 @@ export default function ActiveWorkout() {
           <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground uppercase tracking-wide">Rest</span>
-                <span className={cn(
-                  'text-3xl font-bold tabular-nums',
-                  restTimer.seconds <= 10 && 'text-destructive'
-                )}>
-                  {Math.floor(restTimer.seconds / 60)}:{(restTimer.seconds % 60).toString().padStart(2, '0')}
+                <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                  Rest
+                </span>
+                <span
+                  className={cn(
+                    "text-3xl font-bold tabular-nums",
+                    restTimer.seconds <= 10 && "text-destructive",
+                  )}
+                >
+                  {Math.floor(restTimer.seconds / 60)}:
+                  {(restTimer.seconds % 60).toString().padStart(2, "0")}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline" onClick={() => dispatch(addRestTime(15))}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => dispatch(addRestTime(15))}
+                >
                   +15s
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => dispatch(stopRestTimer())}>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => dispatch(stopRestTimer())}
+                >
                   Stop
                 </Button>
               </div>
@@ -349,7 +431,7 @@ export default function ActiveWorkout() {
             <Button
               onClick={handleFinishWorkout}
               className="w-full h-14 text-lg font-semibold"
-              style={{ borderRadius: 'var(--radius)' }}
+              style={{ borderRadius: "var(--radius)" }}
               disabled={completedSets === 0}
             >
               <Check className="w-5 h-5 mr-2" />
