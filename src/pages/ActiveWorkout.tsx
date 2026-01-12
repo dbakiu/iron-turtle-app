@@ -1,5 +1,5 @@
 import { ActiveSetRow } from "@/components/ActiveSetRow";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
@@ -72,6 +72,9 @@ export default function ActiveWorkout() {
   );
   const restTimer = useAppSelector((state) => state.ui.restTimer);
 
+  // Ref to track the previous activeWorkout state for completion transitions
+  const prevActiveWorkoutRef = useRef(activeWorkout);
+
   // Duration timer
   useEffect(() => {
     if (!activeWorkout) {
@@ -96,6 +99,75 @@ export default function ActiveWorkout() {
 
     return () => clearInterval(interval);
   }, [restTimer.isRunning, dispatch]);
+
+  // Auto-open next exercise / auto-collapse completed exercise
+  useEffect(() => {
+    // If activeWorkout becomes null, ensure activeExerciseId is null
+    if (!activeWorkout) {
+      if (activeExerciseId !== null) {
+        dispatch(setActiveExerciseId(null));
+      }
+      prevActiveWorkoutRef.current = null; // Reset ref
+      return;
+    }
+
+    // Initialize prevActiveWorkoutRef if it's the first render with an activeWorkout
+    if (!prevActiveWorkoutRef.current) {
+      prevActiveWorkoutRef.current = activeWorkout;
+      // On initial load, if there's an active workout, open the first uncompleted exercise
+      if (activeExerciseId === null && activeWorkout.exercises.length > 0) {
+        const firstUncompleted = activeWorkout.exercises.find(
+          (ex) => !ex.sets.every((set) => set.is_completed),
+        );
+        if (firstUncompleted) {
+          dispatch(setActiveExerciseId(firstUncompleted.id));
+        }
+      }
+      return;
+    }
+
+    // Compare current activeWorkout with previous activeWorkout
+    const prevExercises = prevActiveWorkoutRef.current.exercises;
+    const currentExercises = activeWorkout.exercises;
+
+    // Find the exercise that was previously open and check if it just completed
+    const currentOpenExercise = currentExercises.find(
+      (ex) => ex.id === activeExerciseId,
+    );
+    const prevOpenExercise = prevExercises.find(
+      (ex) => ex.id === activeExerciseId,
+    );
+
+    // Only act if the currently open exercise (which was previously open) just became completed.
+    // This condition prevents auto-closing of manually opened *already completed* exercises.
+    if (
+      activeExerciseId &&
+      currentOpenExercise &&
+      prevOpenExercise &&
+      !prevOpenExercise.sets.every((set) => set.is_completed) && // Was uncompleted
+      currentOpenExercise.sets.every((set) => set.is_completed)
+    ) {
+      // Now completed
+
+      const currentIndex = currentExercises.findIndex(
+        (ex) => ex.id === activeExerciseId,
+      );
+      const nextUncompletedExercise = currentExercises
+        .slice(currentIndex + 1)
+        .find((ex) => !ex.sets.every((set) => set.is_completed));
+
+      if (nextUncompletedExercise) {
+        dispatch(setActiveExerciseId(nextUncompletedExercise.id));
+      } else {
+        // All exercises are now completed. Close all collapsibles.
+        // This dispatch is safe because this condition only triggers when the last uncompleted set is completed.
+        dispatch(setActiveExerciseId(null));
+      }
+    }
+
+    // Update the ref for the next render cycle
+    prevActiveWorkoutRef.current = activeWorkout;
+  }, [activeWorkout, activeExerciseId, dispatch]);
 
   const handleStartEmptyWorkout = async () => {
     await startWorkout({ name: "New Workout" });
@@ -318,23 +390,34 @@ export default function ActiveWorkout() {
                     )
                   }
                 >
-                  <div className="stat-card">
-                    <CollapsibleTrigger className="w-full">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold text-left">{workoutExercise.exercise.name}</h3>
-                          {workoutExercise.exercise.primary_muscle_group && (
-                            <p className="text-xs text-muted-foreground capitalize">{workoutExercise.exercise.primary_muscle_group.toLowerCase().replace(/_/g, ' ')}</p>
-                          )}
-                        </div>
-                        <ChevronDown
-                          className={cn(
-                            "w-5 h-5 text-muted-foreground transition-transform",
-                            activeExerciseId === workoutExercise.id &&
-                              "rotate-180",
-                          )}
-                        />
+                  <div
+                    className={cn(
+                      "stat-card",
+                      workoutExercise.sets.every((set) => set.is_completed) &&
+                        activeExerciseId !== workoutExercise.id &&
+                        "bg-green-500/20",
+                    )}
+                  >
+                    <CollapsibleTrigger className="w-full flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-left">
+                          {workoutExercise.exercise.name}
+                        </h3>
+                        {workoutExercise.exercise.primary_muscle_group && (
+                          <p className="text-xs text-muted-foreground capitalize text-left mt-0 mb-0 pt-1">
+                            {workoutExercise.exercise.primary_muscle_group
+                              .toLowerCase()
+                              .replace(/_/g, " ")}
+                          </p>
+                        )}
                       </div>
+                      <ChevronDown
+                        className={cn(
+                          "w-5 h-5 text-muted-foreground transition-transform",
+                          activeExerciseId === workoutExercise.id &&
+                            "rotate-180",
+                        )}
+                      />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="flex items-center gap-2 px-2 pb-2 mt-3 border-b border-border">

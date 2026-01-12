@@ -1,16 +1,26 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Play, Calendar, Dumbbell, Clock, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Play,
+  Calendar,
+  Dumbbell,
+  Clock,
+  ChevronRight,
+  Book,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { useGetActiveWorkoutQuery, useStartWorkoutMutation } from '@/store/api/activeWorkoutApi';
-import { useGetWorkoutHistoryQuery } from '@/store/api/historyApi';
-
+} from "@/components/ui/sheet";
+import {
+  useGetActiveWorkoutQuery,
+  useStartWorkoutMutation,
+} from "@/store/api/activeWorkoutApi";
+import { useGetWorkoutHistoryQuery } from "@/store/api/historyApi";
+import IronTurtleLogo from "/iron_turtle_logo.png";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { data: activeWorkout } = useGetActiveWorkoutQuery();
@@ -18,8 +28,8 @@ export default function Dashboard() {
   const [startWorkout] = useStartWorkoutMutation();
 
   const handleStartEmptyWorkout = async () => {
-    await startWorkout({ name: 'New Workout' });
-    navigate('/workout/active');
+    await startWorkout({ name: "New Workout" });
+    navigate("/workout/active");
   };
 
   const isActive = !!activeWorkout;
@@ -30,12 +40,21 @@ export default function Dashboard() {
         {/* Header */}
         <header className="pt-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center" style={{ borderRadius: 'var(--radius)' }}>
-              <Dumbbell className="w-6 h-6 text-primary" />
+            <div
+              className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center"
+              style={{ borderRadius: "var(--radius)" }}
+            >
+              <img
+                src={IronTurtleLogo}
+                alt="Iron Turtle Logo"
+                className="w-8 h-8 invert"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Iron Turtle</h1>
-              <p className="text-sm text-muted-foreground">Train. Track. Transform.</p>
+              <p className="text-sm text-muted-foreground">
+                Train. Track. Transform.
+              </p>
             </div>
           </div>
         </header>
@@ -47,8 +66,12 @@ export default function Dashboard() {
               <div className="stat-card bg-primary/5 border-primary/20 p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-primary font-semibold uppercase tracking-wide mb-1">Workout in Progress</p>
-                    <p className="text-lg font-semibold">{activeWorkout.name}</p>
+                    <p className="text-sm text-primary font-semibold uppercase tracking-wide mb-1">
+                      Workout in Progress
+                    </p>
+                    <p className="text-lg font-semibold">
+                      {activeWorkout.name}
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
                     <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
@@ -62,7 +85,7 @@ export default function Dashboard() {
                 <Button
                   size="lg"
                   className="w-full h-14 text-lg font-semibold"
-                  style={{ borderRadius: 'var(--radius)' }}
+                  style={{ borderRadius: "var(--radius)" }}
                 >
                   <Play className="w-5 h-5 mr-2" />
                   Start Workout
@@ -99,27 +122,37 @@ export default function Dashboard() {
             <Link to="/templates">
               <div className="stat-card flex items-center justify-between hover:bg-accent/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-chart-3/20 flex items-center justify-center" style={{ borderRadius: 'var(--radius)' }}>
+                  <div
+                    className="w-10 h-10 rounded-lg bg-chart-3/20 flex items-center justify-center"
+                    style={{ borderRadius: "var(--radius)" }}
+                  >
                     <Dumbbell className="w-5 h-5 text-chart-3" />
                   </div>
                   <div>
                     <p className="font-medium">Workout Templates</p>
-                    <p className="text-sm text-muted-foreground">Start from a template</p>
+                    <p className="text-sm text-muted-foreground">
+                      Start from a template
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </div>
             </Link>
-            
+
             <Link to="/exercises">
               <div className="stat-card flex items-center justify-between hover:bg-accent/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" style={{ borderRadius: 'var(--radius)' }}>
-                    <Dumbbell className="w-5 h-5 text-primary" />
+                  <div
+                    className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"
+                    style={{ borderRadius: "var(--radius)" }}
+                  >
+                    <Book className="w-5 h-5 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium">Exercise Library</p>
-                    <p className="text-sm text-muted-foreground">Browse all exercises</p>
+                    <p className="text-sm text-muted-foreground">
+                      Browse all exercises
+                    </p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -131,14 +164,16 @@ export default function Dashboard() {
         {/* Recent Workouts */}
         <section>
           <h2 className="text-lg font-semibold mb-3">Recent History</h2>
-          
+
           {workoutHistory.length === 0 ? (
             <div className="stat-card text-center py-8">
               <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
                 <Calendar className="w-8 h-8 text-muted-foreground" />
               </div>
               <p className="text-muted-foreground mb-2">No workouts yet</p>
-              <p className="text-sm text-muted-foreground">Start your first workout to see your history</p>
+              <p className="text-sm text-muted-foreground">
+                Start your first workout to see your history
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -148,7 +183,8 @@ export default function Dashboard() {
                     <div>
                       <p className="font-medium">{workout.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(workout.started_at).toLocaleDateString()} · {workout.exercises.length} exercises
+                        {new Date(workout.started_at).toLocaleDateString()} ·{" "}
+                        {workout.exercises.length} exercises
                       </p>
                     </div>
                     <Clock className="w-4 h-4 text-muted-foreground" />
