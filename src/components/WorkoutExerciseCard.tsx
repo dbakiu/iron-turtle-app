@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -82,11 +83,13 @@ export default function WorkoutExerciseCard({
               <MoreVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onDelete(workoutExercise.id)}>
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onDelete(workoutExercise.id)}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
       </div>
     </div>

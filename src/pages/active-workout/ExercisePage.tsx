@@ -231,25 +231,24 @@ export default function ExercisePage() {
                   </div>
         
                   {activeReferenceTab !== "none" && (
-                    <div className="mt-4 p-3 border rounded-lg bg-muted/20">
-                      {activeReferenceTab === "notes" && (
-                        <p className="text-sm text-muted-foreground">
-                          {workoutExercise.exercise.notes ||
-                            "No notes available for this exercise."}
-                        </p>
-                      )}
-                      {activeReferenceTab === "history" && (
-                        <p className="text-sm text-muted-foreground">
-                          Workout history coming soon!
-                        </p>
-                      )}
-                      {activeReferenceTab === "alternatives" && (
-                        <p className="text-sm text-muted-foreground">
-                          Alternative exercises coming soon!
-                        </p>
-                      )}
-                    </div>
-                  )}
+                                <div className="mt-4 p-3 border rounded-lg bg-muted/20">
+                                  {activeReferenceTab === "notes" && (
+                                    <p className="text-sm text-muted-foreground text-wrap">
+                                      {workoutExercise.exercise.notes ||
+                                        "No notes available for this exercise."}
+                                    </p>
+                                  )}
+                                  {activeReferenceTab === "history" && (
+                                    <p className="text-sm text-muted-foreground text-wrap">
+                                      Workout history coming soon!
+                                    </p>
+                                  )}
+                                  {activeReferenceTab === "alternatives" && (
+                                    <p className="text-sm text-muted-foreground text-wrap">
+                                      Alternative exercises coming soon!
+                                    </p>
+                                  )}
+                                </div>                  )}
                 </Card>
               </div>
         
