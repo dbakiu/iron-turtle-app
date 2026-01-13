@@ -145,139 +145,108 @@ export default function ExercisePage() {
         </div>
 
         {/* Exercise Details / Reference Section */}
-        <Card className="shadow-none p-4">
-          <div className="flex gap-2 justify-between">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() =>
-                setActiveReferenceTab(
-                  activeReferenceTab === "notes" ? "none" : "notes",
-                )
-              }
-            >
-              <Info className="w-4 h-4 mr-2" />
-              Notes
-            </Button>
-            {workoutExercise.exercise.mediaUrl && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a
-                      href={workoutExercise.exercise.mediaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                <Card className="shadow-none p-4">
+                  <div className="flex gap-2 justify-between">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        setActiveReferenceTab(
+                          activeReferenceTab === "notes" ? "none" : "notes",
+                        )
+                      }
                     >
-                      <Button variant="outline" size="icon">
-                        <Film className="w-4 h-4" />
-                      </Button>
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View Exercise Video</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() =>
-                setActiveReferenceTab(
-                  activeReferenceTab === "history" ? "none" : "history",
-                )
-              }
-            >
-              <History className="w-4 h-4 mr-2" />
-              History
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() =>
-                setActiveReferenceTab(
-                  activeReferenceTab === "alternatives"
-                    ? "none"
-                    : "alternatives",
-                )
-              }
-            >
-              <Book className="w-4 h-4 mr-2" />
-              Alternatives
-            </Button>
-          </div>
-
-          {activeReferenceTab !== "none" && (
-            <div className="mt-4 p-3 border rounded-lg bg-muted/20">
-              {activeReferenceTab === "notes" && (
-                <p className="text-sm text-muted-foreground">
-                  {workoutExercise.exercise.notes ||
-                    "No notes available for this exercise."}
-                </p>
-              )}
-              {activeReferenceTab === "history" && (
-                <p className="text-sm text-muted-foreground">
-                  Workout history coming soon!
-                </p>
-              )}
-              {activeReferenceTab === "alternatives" && (
-                <p className="text-sm text-muted-foreground">
-                  Alternative exercises coming soon!
-                </p>
-              )}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* Rest Timer */}
-      {restTimer.isRunning && (
-        <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
-          <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground uppercase tracking-wide">
-                  Rest
-                </span>
-                <span
-                  className={cn(
-                    "text-3xl font-bold tabular-nums",
-                    restTimer.seconds <= 10 && "text-destructive",
+                      <Info className="w-4 h-4 mr-2" />
+                      Notes
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        setActiveReferenceTab(
+                          activeReferenceTab === "history" ? "none" : "history",
+                        )
+                      }
+                    >
+                      <History className="w-4 h-4 mr-2" />
+                      History
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        setActiveReferenceTab(
+                          activeReferenceTab === "alternatives" ? "none" : "alternatives",
+                        )
+                      }
+                    >
+                      <Book className="w-4 h-4 mr-2" />
+                      Alternatives
+                    </Button>
+                  </div>
+        
+                  {activeReferenceTab !== "none" && (
+                    <div className="mt-4 p-3 border rounded-lg bg-muted/20">
+                      {activeReferenceTab === "notes" && (
+                        <p className="text-sm text-muted-foreground">
+                          {workoutExercise.exercise.notes ||
+                            "No notes available for this exercise."}
+                        </p>
+                      )}
+                      {activeReferenceTab === "history" && (
+                        <p className="text-sm text-muted-foreground">
+                          Workout history coming soon!
+                        </p>
+                      )}
+                      {activeReferenceTab === "alternatives" && (
+                        <p className="text-sm text-muted-foreground">
+                          Alternative exercises coming soon!
+                        </p>
+                      )}
+                    </div>
                   )}
-                >
-                  {Math.floor(restTimer.seconds / 60)}:
-                  {(restTimer.seconds % 60).toString().padStart(2, "0")}
-                </span>
+                </Card>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => dispatch(addRestTime(15))}
-                >
-                  +15s
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => dispatch(stopRestTimer())}
-                >
-                  Stop
-                </Button>
-              </div>
+        
+              {/* Rest Timer */}
+              {restTimer.isRunning && (
+                <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
+                  <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                          Rest
+                        </span>
+                        <span
+                          className={cn(
+                            "text-3xl font-bold tabular-nums",
+                            restTimer.seconds <= 10 && "text-destructive",
+                          )}
+                        >
+                          {Math.floor(restTimer.seconds / 60)}:
+                          {(restTimer.seconds % 60).toString().padStart(2, "0")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => dispatch(addRestTime(15))}
+                        >
+                          +15s
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => dispatch(stopRestTimer())}
+                        >
+                          Stop
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Dummy data for mediaUrl and notes for demonstration
-// In a real application, these would come from the API
-declare module "@/types/workout" {
-  export interface Exercise {
-    mediaUrl?: string;
-    notes?: string;
-  }
-}
+          );
+        }

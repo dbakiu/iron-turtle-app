@@ -50,7 +50,6 @@ export function ActiveSetCard({
   const [reps, setReps] = useState((set.reps || set.duration || 0).toString());
   const [setType, setSetType] = useState(set.set_type);
   const [isEditing, setIsEditing] = useState(false);
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   const [updateSet] = useUpdateSetMutation();
   const [completeSet] = useCompleteSetMutation();
@@ -183,16 +182,24 @@ export function ActiveSetCard({
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
         <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-3">
-          <Select value={setType} onValueChange={handleTypeChange} onOpenChange={setIsSelectOpen}>
-            <SelectTrigger className="w-16 h-12 p-0 border-2 rounded-lg">
-              <SelectValue>
-                <div className="flex flex-col items-center">
-                  <span className="font-bold text-lg">{setType.charAt(0)}</span>
-                  {isSelectOpen && (
-                    <span className="text-xs -mt-1 text-muted-foreground uppercase">{setType}</span>
-                  )}
-                </div>
-              </SelectValue>
+          <Select value={setType} onValueChange={handleTypeChange}>
+            <SelectTrigger
+              className={cn(
+                "w-16 h-12 p-0 border-2 rounded-lg font-bold text-lg",
+                "focus:ring-0 focus:ring-offset-0", // override default focus
+                setType === "WARMUP" &&
+                  "border-warmup/50 text-warmup hover:bg-warmup/10",
+                setType === "WORKING" &&
+                  "border-working/50 text-working hover:bg-working/10",
+                setType === "MYOREP" &&
+                  "border-myorep/50 text-myorep hover:bg-myorep/10",
+                setType === "FAILURE" &&
+                  "border-failure/50 text-failure hover:bg-failure/10",
+                setType === "AMRAP" &&
+                  "border-amber-500/50 text-amber-500 hover:bg-amber-500/10",
+              )}
+            >
+              <SelectValue>{setType.charAt(0)}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {setTypes.map((type) => (
