@@ -41,6 +41,7 @@ export default function ExercisePage() {
   const [activeReferenceTab, setActiveReferenceTab] = useState<
     "none" | "notes" | "history" | "alternatives"
   >("none");
+  const [editingSetId, setEditingSetId] = useState<string | null>(null);
 
   const { data: activeWorkout, isLoading } = useGetActiveWorkoutQuery();
   const [addSet] = useAddSetMutation();
@@ -50,6 +51,12 @@ export default function ExercisePage() {
   const workoutExercise = activeWorkout?.exercises.find(
     (ex) => ex.id === workoutExerciseId,
   );
+
+  // Reset editing state when navigating to a new exercise
+  useEffect(() => {
+    setEditingSetId(null);
+  }, [workoutExerciseId]);
+
 
   // Rest timer
   useEffect(() => {
@@ -124,16 +131,21 @@ export default function ExercisePage() {
       <div className="p-4 max-w-lg mx-auto space-y-4">
         {/* Sets List */}
         <div className="space-y-3">
-          {workoutExercise.sets.map((set, index) => (
-            <ActiveSetCard
-              key={set.id}
-              set={set}
-              exerciseId={workoutExercise.id}
-              setIndex={index}
-              isCurrent={index === currentSetIndex}
-              isFuture={currentSetIndex !== -1 && index > currentSetIndex}
-            />
-          ))}
+          {workoutExercise.sets.map((set, index) => {
+            const isOpen = (editingSetId === null && index === currentSetIndex) || editingSetId === set.id;
+            
+            return (
+              <ActiveSetCard
+                key={set.id}
+                set={set}
+                exerciseId={workoutExercise.id}
+                setIndex={index}
+                isOpen={isOpen}
+                isFuture={currentSetIndex !== -1 && index > currentSetIndex}
+                setEditing={setEditingSetId}
+              />
+            )
+          })}
           <Button
             variant="outline"
             className="w-full border-dashed mt-2"

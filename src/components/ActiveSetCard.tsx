@@ -33,8 +33,9 @@ interface ActiveSetCardProps {
   set: WorkoutSet;
   exerciseId: string;
   setIndex: number;
-  isCurrent: boolean;
+  isOpen: boolean;
   isFuture: boolean;
+  setEditing: (setId: string | null) => void;
 }
 
 const setTypes: SetType[] = ["WARMUP", "WORKING", "MYOREP", "FAILURE", "AMRAP"];
@@ -43,13 +44,13 @@ export function ActiveSetCard({
   set,
   exerciseId,
   setIndex,
-  isCurrent,
+  isOpen,
   isFuture,
+  setEditing,
 }: ActiveSetCardProps) {
   const [weight, setWeight] = useState(set.weight.toString());
   const [reps, setReps] = useState((set.reps || set.duration || 0).toString());
   const [setType, setSetType] = useState(set.set_type);
-  const [isEditing, setIsEditing] = useState(false);
 
   const [updateSet] = useUpdateSetMutation();
   const [completeSet] = useCompleteSetMutation();
@@ -60,13 +61,6 @@ export function ActiveSetCard({
     setReps((set.reps || set.duration || 0).toString());
     setSetType(set.set_type);
   }, [set]);
-
-  useEffect(() => {
-    // If a set is no longer current, it's not being actively edited
-    if (!isCurrent) {
-      setIsEditing(false);
-    }
-  }, [isCurrent]);
 
   const handleUpdate = (field: "weight" | "reps" | "setType") => {
     const isDuration = set.duration !== undefined;
@@ -91,7 +85,22 @@ export function ActiveSetCard({
     updateSet({ exerciseId, setId: set.id, updates: { set_type: value } });
   };
 
+  const handleQuickAdd = (field: "weight" | "reps", amount: number) => {
+    let newValue: number;
+    if (field === "weight") {
+      newValue = (parseFloat(weight) || 0) + amount;
+      setWeight(newValue.toString());
+      updateSet({ exerciseId, setId: set.id, updates: { weight: newValue } });
+    } else {
+      newValue = (parseInt(reps, 10) || 0) + amount;
+      setReps(newValue.toString());
+      const isDuration = set.duration !== undefined;
+      updateSet({ exerciseId, setId: set.id, updates: { [isDuration ? "duration" : "reps"]: newValue } });
+    }
+  };
+
   const handleComplete = async () => {
+    const wasCompleted = set.is_completed;
     await updateSet({
       exerciseId,
       setId: set.id,
@@ -99,10 +108,14 @@ export function ActiveSetCard({
         weight: parseFloat(weight) || 0,
         [set.duration !== undefined ? "duration" : "reps"]: parseInt(reps, 10) || 0,
         set_type: setType,
+        is_completed: true, // Ensure it's marked as completed
       },
     });
-    await completeSet({ exerciseId, setId: set.id });
-    setIsEditing(false); // Exit editing mode on completion
+    // Only call completeSet if it wasn't already completed, to avoid creating multiple history entries if logic changes
+    if (!wasCompleted) {
+      await completeSet({ exerciseId, setId: set.id });
+    }
+    setEditing(null); // Exit editing mode on completion
   };
 
   const handleRemove = () => {
@@ -110,15 +123,7 @@ export function ActiveSetCard({
   };
 
   const handleMakeEditable = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    // Revert changes and exit editing mode
-    setWeight(set.weight.toString());
-    setReps((set.reps || set.duration || 0).toString());
-    setSetType(set.set_type);
-    setIsEditing(false);
+    setEditing(set.id);
   };
 
   if (isFuture) {
@@ -132,9 +137,9 @@ export function ActiveSetCard({
     );
   }
 
-  if (set.is_completed && !isEditing) {
+  if (!isOpen) {
     return (
-      <Card className="bg-primary/10">
+      <Card className={cn(set.is_completed && "bg-primary/10")}>
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span
@@ -169,9 +174,9 @@ export function ActiveSetCard({
     );
   }
 
-  // Current (isCurrent) or editing (isEditing) set
+  // Open (isOpen) set
   return (
-    <Card className={cn(isCurrent && "border-primary ring-2 ring-primary")}>
+    <Card className={cn(isOpen && !set.is_completed && "border-primary ring-2 ring-primary")}>
       <CardHeader className="p-4 flex flex-row items-center justify-between">
         <CardTitle className="text-xl text-muted-foreground">
           Set {setIndex + 1}
@@ -205,7 +210,7 @@ export function ActiveSetCard({
         </Select>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
-        <div className="grid grid-cols-[1fr_1fr] items-center gap-3">
+        <div className="grid grid-cols-[1fr_1fr] items-start gap-3">
           <div className="flex flex-col items-center">
             <label className="text-xs uppercase text-muted-foreground mb-1">Weight (kg)</label>
             <Input
@@ -219,6 +224,11 @@ export function ActiveSetCard({
               onBlur={() => handleUpdate("weight")}
               min={0}
             />
+            <div className="flex gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 2.5)}>+2.5</Button>
+              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 5)}>+5</Button>
+              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 10)}>+10</Button>
+            </div>
           </div>
 
           <div className="flex flex-col items-center">
@@ -236,6 +246,10 @@ export function ActiveSetCard({
               onBlur={() => handleUpdate("reps")}
               min={0}
             />
+            <div className="flex gap-2 mt-2">
+              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("reps", 1)}>+1</Button>
+              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("reps", 5)}>+5</Button>
+            </div>
           </div>
         </div>
 
@@ -245,7 +259,7 @@ export function ActiveSetCard({
           className="w-full h-12 text-lg"
         >
           <Check className="w-5 h-5 mr-2" />
-          {isEditing ? "Save Changes" : "Complete Set"}
+          {set.is_completed ? "Save Changes" : "Complete Set"}
         </Button>
       </CardContent>
     </Card>
