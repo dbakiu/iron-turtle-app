@@ -172,44 +172,40 @@ export function ActiveSetCard({
   // Current (isCurrent) or editing (isEditing) set
   return (
     <Card className={cn(isCurrent && "border-primary ring-2 ring-primary")}>
-      <CardHeader className="p-4">
-        <CardTitle className="flex items-center justify-between">
-          <span>{isCurrent ? `Current Set: ${setIndex + 1}` : `Editing Set: ${setIndex + 1}`}</span>
-          {isEditing && (
-            <Button variant="ghost" size="sm" onClick={handleCancelEdit}>Cancel</Button>
-          )}
+      <CardHeader className="p-4 flex flex-row items-center justify-between">
+        <CardTitle className="text-xl text-muted-foreground">
+          Set {setIndex + 1}
         </CardTitle>
+        <Select value={setType} onValueChange={handleTypeChange}>
+          <SelectTrigger
+            className={cn(
+              "w-auto h-12 px-4 border-2 rounded-lg font-bold text-lg",
+              "focus:ring-0 focus:ring-offset-0", // override default focus
+              setType === "WARMUP" &&
+                "border-warmup/50 text-warmup hover:bg-warmup/10",
+              setType === "WORKING" &&
+                "border-working/50 text-working hover:bg-working/10",
+              setType === "MYOREP" &&
+                "border-myorep/50 text-myorep hover:bg-myorep/10",
+              setType === "FAILURE" &&
+                "border-failure/50 text-failure hover:bg-failure/10",
+              setType === "AMRAP" &&
+                "border-amber-500/50 text-amber-500 hover:bg-amber-500/10",
+            )}
+          >
+            <SelectValue>{setType}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {setTypes.map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent className="p-4 pt-0 space-y-4">
-        <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-3">
-          <Select value={setType} onValueChange={handleTypeChange}>
-            <SelectTrigger
-              className={cn(
-                "w-16 h-12 p-0 border-2 rounded-lg font-bold text-lg",
-                "focus:ring-0 focus:ring-offset-0", // override default focus
-                setType === "WARMUP" &&
-                  "border-warmup/50 text-warmup hover:bg-warmup/10",
-                setType === "WORKING" &&
-                  "border-working/50 text-working hover:bg-working/10",
-                setType === "MYOREP" &&
-                  "border-myorep/50 text-myorep hover:bg-myorep/10",
-                setType === "FAILURE" &&
-                  "border-failure/50 text-failure hover:bg-failure/10",
-                setType === "AMRAP" &&
-                  "border-amber-500/50 text-amber-500 hover:bg-amber-500/10",
-              )}
-            >
-              <SelectValue>{setType.charAt(0)}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {setTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+        <div className="grid grid-cols-[1fr_1fr] items-center gap-3">
           <div className="flex flex-col items-center">
             <label className="text-xs uppercase text-muted-foreground mb-1">Weight (kg)</label>
             <Input

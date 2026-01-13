@@ -142,6 +142,39 @@ export default function ExercisePage() {
             <Plus className="w-4 h-4 mr-2" />
             Add Set
           </Button>
+
+          {workoutExercise.sets.every((set) => set.is_completed) &&
+            (() => {
+              const currentIndex = activeWorkout.exercises.findIndex((ex) => ex.id === workoutExerciseId);
+              if (currentIndex < activeWorkout.exercises.length - 1) {
+                return (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full h-12 text-lg mt-2"
+                    onClick={() => {
+                      const nextExercise = activeWorkout.exercises[currentIndex + 1];
+                      if (nextExercise) {
+                        navigate(`/workout/active/exercise/${nextExercise.id}`);
+                      }
+                    }}
+                  >
+                    Next Exercise
+                  </Button>
+                );
+              } else {
+                return (
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full h-12 text-lg mt-2"
+                    onClick={() => navigate('/workout/active')}
+                  >
+                    Back to Overview
+                  </Button>
+                );
+              }
+            })()}
         </div>
 
         {/* Exercise Details / Reference Section */}
