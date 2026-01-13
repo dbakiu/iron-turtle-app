@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { store } from "./store";
 import Dashboard from "./pages/Dashboard";
 import Templates from "./pages/Templates";
-import ActiveWorkout from "./pages/ActiveWorkout";
+import WorkoutOverview from "./pages/active-workout/WorkoutOverview";
+import ExercisePage from "./pages/active-workout/ExercisePage";
 import Exercises from "./pages/Exercises";
 import NotFound from "./pages/NotFound";
 import { ExerciseCreator } from './pages/ExerciseCreator';
@@ -25,7 +26,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/templates" element={<Templates />} />
-            <Route path="/workout/active" element={<ActiveWorkout />} />
+            <Route path="/workout/active" element={<WorkoutOverview />} />
+            <Route path="/workout/active/exercise/:workoutExerciseId" element={<ExercisePage />} />
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercises/new" element={<ExerciseCreator />} />
             <Route path="/templates/new" element={<TemplateCreator />} />

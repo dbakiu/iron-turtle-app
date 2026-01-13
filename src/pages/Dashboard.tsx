@@ -197,12 +197,12 @@ export default function Dashboard() {
       </div>
 
       {/* Bottom Nav */}
-      <BottomNav />
+      <BottomNav isActive={isActive} />
     </div>
   );
 }
 
-function BottomNav() {
+function BottomNav({ isActive }: { isActive: boolean }) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 glass-panel border-t">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
@@ -215,7 +215,11 @@ function BottomNav() {
           <span className="text-xs font-medium">Templates</span>
         </Link>
         <Link to="/workout/active" className="nav-link flex-1">
-          <Play className="w-5 h-5" />
+          {isActive ? (
+            <Play className="w-5 h-5 text-primary" />
+          ) : (
+            <Dumbbell className="w-5 h-5" />
+          )}
           <span className="text-xs font-medium">Workout</span>
         </Link>
         <Link to="/exercises" className="nav-link flex-1">

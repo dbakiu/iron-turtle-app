@@ -1,0 +1,283 @@
+import { useEffect, useState } from "react";
+import {
+  Plus,
+  ChevronLeft,
+  Clock,
+  Film,
+  Book,
+  History,
+  Info,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  useGetActiveWorkoutQuery,
+  useAddSetMutation,
+} from "@/store/api/activeWorkoutApi";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  tickRestTimer,
+  startRestTimer,
+  stopRestTimer,
+  addRestTime,
+} from "@/store/slices/uiSlice";
+import { cn } from "@/lib/utils";
+import { ActiveSetCard } from "@/components/ActiveSetCard";
+import { Card } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
+
+export default function ExercisePage() {
+  const { workoutExerciseId } = useParams<{ workoutExerciseId: string }>();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+
+  const [activeReferenceTab, setActiveReferenceTab] = useState<
+    "none" | "notes" | "history" | "alternatives"
+  >("none");
+
+  const { data: activeWorkout, isLoading } = useGetActiveWorkoutQuery();
+  const [addSet] = useAddSetMutation();
+
+  const restTimer = useAppSelector((state) => state.ui.restTimer);
+
+  const workoutExercise = activeWorkout?.exercises.find(
+    (ex) => ex.id === workoutExerciseId,
+  );
+
+  // Rest timer
+  useEffect(() => {
+    if (!restTimer.isRunning) return;
+
+    const interval = setInterval(() => {
+      dispatch(tickRestTimer());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [restTimer.isRunning, dispatch]);
+
+  const handleAddSet = () => {
+    if (!workoutExercise) return;
+
+    const lastSet = workoutExercise.sets[workoutExercise.sets.length - 1];
+    const newSet = {
+      exercise_id: workoutExercise.exercise.id,
+      set_type: lastSet?.set_type || "WORKING",
+      weight: lastSet?.weight || 0,
+      reps: lastSet?.reps || 0,
+      duration: lastSet?.duration,
+      is_completed: false,
+    };
+
+    addSet({ exerciseId: workoutExercise.id, set: newSet });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!activeWorkout || !workoutExercise) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">
+          Exercise not found or no active workout.
+        </p>
+      </div>
+    );
+  }
+
+  const currentSetIndex = workoutExercise.sets.findIndex(
+    (s) => !s.is_completed,
+  );
+
+  return (
+    <div className="min-h-screen bg-background pb-44">
+      <header className="p-4 flex items-center justify-between border-b border-border">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ChevronLeft className="w-6 h-6" />
+        </Button>
+        <div className="flex-grow text-center">
+          <h1 className="text-xl font-bold truncate px-4">
+            {workoutExercise.exercise.name}
+          </h1>
+          {workoutExercise.exercise.primary_muscle_group && (
+            <p className="text-sm text-muted-foreground capitalize mt-0.5">
+              {workoutExercise.exercise.primary_muscle_group
+                .toLowerCase()
+                .replace(/_/g, " ")}
+            </p>
+          )}
+        </div>
+        <div className="w-10"></div> {/* Spacer to balance header */}
+      </header>
+
+      <div className="p-4 max-w-lg mx-auto space-y-4">
+        {/* Sets List */}
+        <div className="space-y-3">
+          {workoutExercise.sets.map((set, index) => (
+            <ActiveSetCard
+              key={set.id}
+              set={set}
+              exerciseId={workoutExercise.id}
+              setIndex={index}
+              isCurrent={index === currentSetIndex}
+              isFuture={currentSetIndex !== -1 && index > currentSetIndex}
+            />
+          ))}
+          <Button
+            variant="outline"
+            className="w-full border-dashed mt-2"
+            onClick={handleAddSet}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Set
+          </Button>
+        </div>
+
+        {/* Exercise Details / Reference Section */}
+        <Card className="shadow-none p-4">
+          <div className="flex gap-2 justify-between">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "notes" ? "none" : "notes",
+                )
+              }
+            >
+              <Info className="w-4 h-4 mr-2" />
+              Notes
+            </Button>
+            {workoutExercise.exercise.mediaUrl && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a
+                      href={workoutExercise.exercise.mediaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="outline" size="icon">
+                        <Film className="w-4 h-4" />
+                      </Button>
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View Exercise Video</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "history" ? "none" : "history",
+                )
+              }
+            >
+              <History className="w-4 h-4 mr-2" />
+              History
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "alternatives"
+                    ? "none"
+                    : "alternatives",
+                )
+              }
+            >
+              <Book className="w-4 h-4 mr-2" />
+              Alternatives
+            </Button>
+          </div>
+
+          {activeReferenceTab !== "none" && (
+            <div className="mt-4 p-3 border rounded-lg bg-muted/20">
+              {activeReferenceTab === "notes" && (
+                <p className="text-sm text-muted-foreground">
+                  {workoutExercise.exercise.notes ||
+                    "No notes available for this exercise."}
+                </p>
+              )}
+              {activeReferenceTab === "history" && (
+                <p className="text-sm text-muted-foreground">
+                  Workout history coming soon!
+                </p>
+              )}
+              {activeReferenceTab === "alternatives" && (
+                <p className="text-sm text-muted-foreground">
+                  Alternative exercises coming soon!
+                </p>
+              )}
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* Rest Timer */}
+      {restTimer.isRunning && (
+        <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
+          <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                  Rest
+                </span>
+                <span
+                  className={cn(
+                    "text-3xl font-bold tabular-nums",
+                    restTimer.seconds <= 10 && "text-destructive",
+                  )}
+                >
+                  {Math.floor(restTimer.seconds / 60)}:
+                  {(restTimer.seconds % 60).toString().padStart(2, "0")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => dispatch(addRestTime(15))}
+                >
+                  +15s
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => dispatch(stopRestTimer())}
+                >
+                  Stop
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Dummy data for mediaUrl and notes for demonstration
+// In a real application, these would come from the API
+declare module "@/types/workout" {
+  export interface Exercise {
+    mediaUrl?: string;
+    notes?: string;
+  }
+}
