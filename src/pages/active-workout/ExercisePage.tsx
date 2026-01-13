@@ -201,7 +201,6 @@ export default function ExercisePage() {
                         )
                       }
                     >
-                      <Info className="w-4 h-4 mr-2" />
                       Notes
                     </Button>
                     <Button
@@ -213,7 +212,6 @@ export default function ExercisePage() {
                         )
                       }
                     >
-                      <History className="w-4 h-4 mr-2" />
                       History
                     </Button>
                     <Button
@@ -225,7 +223,6 @@ export default function ExercisePage() {
                         )
                       }
                     >
-                      <Book className="w-4 h-4 mr-2" />
                       Alternatives
                     </Button>
                   </div>

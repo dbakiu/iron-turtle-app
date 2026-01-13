@@ -334,19 +334,36 @@ export default function WorkoutOverview() {
         </div>
       </div>
 
-      {/* Finish Workout Button */}
+      {/* Action Button */}
       {activeWorkout.exercises.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pb-4">
           <div className="max-w-lg mx-auto">
-            <Button
-              onClick={handleFinishWorkout}
-              className="w-full h-14 text-lg font-semibold"
-              style={{ borderRadius: "var(--radius)" }}
-              disabled={completedSets === 0}
-            >
-              <Check className="w-5 h-5 mr-2" />
-              Finish Workout
-            </Button>
+            {completedSets > 0 ? (
+              <Button
+                onClick={handleFinishWorkout}
+                className="w-full h-14 text-lg font-semibold"
+                style={{ borderRadius: "var(--radius)" }}
+              >
+                <Check className="w-5 h-5 mr-2" />
+                Finish Workout
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  const firstUncompleted = activeWorkout.exercises.find(
+                    (ex) => !ex.sets.every((set) => set.is_completed),
+                  );
+                  if (firstUncompleted) {
+                    navigate(`/workout/active/exercise/${firstUncompleted.id}`);
+                  }
+                }}
+                className="w-full h-14 text-lg font-semibold"
+                style={{ borderRadius: "var(--radius)" }}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Start Exercise
+              </Button>
+            )}
           </div>
         </div>
       )}

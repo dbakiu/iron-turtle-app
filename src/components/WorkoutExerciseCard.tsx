@@ -77,7 +77,7 @@ export default function WorkoutExerciseCard({
         {isCompleted && (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         )}
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <MoreVertical className="h-4 w-4" />
