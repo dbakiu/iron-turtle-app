@@ -50,8 +50,8 @@ import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-
 
 export default function WorkoutOverview() {
   const navigate = useNavigate();
@@ -70,13 +70,13 @@ export default function WorkoutOverview() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 150,
-        tolerance: 5,
+        distance: 8,
       },
     }),
-    useSensor(KeyboardSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
-
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -162,8 +162,6 @@ export default function WorkoutOverview() {
     await discardWorkout();
     navigate("/");
   };
-
-
 
   const formatDuration = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);

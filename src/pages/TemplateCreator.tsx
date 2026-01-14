@@ -136,12 +136,15 @@ export default function TemplateCreator() {
   const [isExerciseSelectorOpen, setIsExerciseSelectorOpen] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-
   const {
     control,
     handleSubmit,
