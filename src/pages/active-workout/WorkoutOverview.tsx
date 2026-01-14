@@ -68,8 +68,13 @@ export default function WorkoutOverview() {
 
   // DND
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 10 } }),
-    useSensor(KeyboardSensor, {}),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor),
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
