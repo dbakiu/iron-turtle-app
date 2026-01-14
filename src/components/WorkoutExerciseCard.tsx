@@ -44,7 +44,7 @@ export default function WorkoutExerciseCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "stat-card p-3 flex items-center justify-between relative",
+        "stat-card p-0 flex items-center justify-between", // p-0 on root, padding will be on children
         isDragging && "ring-2 ring-primary",
         isCompleted && "bg-green-500/10",
       )}
@@ -52,13 +52,13 @@ export default function WorkoutExerciseCard({
       <div
         {...listeners}
         {...attributes}
-        className="touch-action-none absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center cursor-grab"
+        className="touch-none flex-shrink-0 w-10 flex items-center justify-center self-stretch cursor-grab"
       >
         <GripVertical className="h-5 w-5 text-muted-foreground" />
       </div>
       <Link
         to={`/workout/active/exercise/${workoutExercise.id}`}
-        className="flex-grow flex items-center gap-3 ml-8"
+        className="flex-grow flex items-center gap-3 py-3"
       >
         <div className="flex-grow">
           <h3 className="font-semibold text-base truncate">
@@ -73,7 +73,7 @@ export default function WorkoutExerciseCard({
           )}
         </div>
       </Link>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 pr-3">
         {isCompleted && (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         )}

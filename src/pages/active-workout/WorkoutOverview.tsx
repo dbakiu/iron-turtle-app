@@ -70,12 +70,10 @@ export default function WorkoutOverview() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 12,
       },
     }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    useSensor(KeyboardSensor),
   );
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
