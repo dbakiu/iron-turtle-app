@@ -184,7 +184,7 @@ export function ActiveSetCard({
         <Select value={setType} onValueChange={handleTypeChange}>
           <SelectTrigger
             className={cn(
-              "w-auto h-12 px-4 border-2 rounded-lg font-bold text-lg",
+              "w-auto h-10 px-3 border-2 rounded-lg font-bold text-base",
               "focus:ring-0 focus:ring-offset-0", // override default focus
               setType === "WARMUP" &&
                 "border-warmup/50 text-warmup hover:bg-warmup/10",
