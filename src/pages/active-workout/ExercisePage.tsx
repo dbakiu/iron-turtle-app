@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Plus,
-  ChevronLeft,
+  LayoutList, // Changed from ChevronLeft
   Clock,
   Film,
   Book,
@@ -9,7 +10,6 @@ import {
   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetActiveWorkoutQuery,
   useAddSetMutation,
@@ -110,9 +110,20 @@ export default function ExercisePage() {
   return (
     <div className="min-h-screen bg-background pb-44">
       <header className="p-4 flex items-center justify-between border-b border-border">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link to="/workout/active">
+                <Button variant="ghost" size="icon">
+                  <LayoutList className="w-6 h-6" />
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Back to Workout Overview</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <div className="flex-grow text-center">
           <h1 className="text-xl font-bold truncate px-4">
             {workoutExercise.exercise.name}

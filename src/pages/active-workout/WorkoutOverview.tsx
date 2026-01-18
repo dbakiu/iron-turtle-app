@@ -63,13 +63,36 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
   const dispatch = useAppDispatch();
   const [startWorkout] = useStartWorkoutMutation();
   const { data: activeWorkout } = useGetActiveWorkoutQuery();
+  const [pendingExercises, setPendingExercises] = useState(template.exercises);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 12,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setPendingExercises((items) => {
+        const oldIndex = items.findIndex((item) => item.exercise.id === active.id);
+        const newIndex = items.findIndex((item) => item.exercise.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+  
   const handleStartWorkout = async () => {
     // Convert template exercises to workout exercises
-    const workoutExercises = template.exercises.map((te, index) => ({
+    const workoutExercises = pendingExercises.map((te, index) => ({
       id: `temp-${index}`,
       exercise: te.exercise,
-      order: te.order,
+      order: index,
       sets: Array.from({ length: te.default_sets }, (_, i) => ({
         id: `temp-set-${index}-${i}`,
         exercise_id: te.exercise.id,
@@ -107,22 +130,38 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
 
         {/* Exercise List */}
         <div className="space-y-4">
-          <div className="space-y-3">
-            {template.exercises.map((templateExercise) => (
-              <div key={templateExercise.exercise.id} className="stat-card p-4">
-                <h3 className="font-semibold">{templateExercise.exercise.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {templateExercise.default_sets} sets x {
-                    typeof templateExercise.default_reps === 'number'
-                      ? templateExercise.default_reps
-                      : Array.isArray(templateExercise.default_reps)
-                        ? templateExercise.default_reps.map(r => (r as any).min ? `${(r as any).min}-${(r as any).max}` : r).join(', ')
-                        : ''
-                  } reps
-                </p>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={pendingExercises.map((item) => item.exercise.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-3">
+                {pendingExercises.map((templateExercise) => (
+                  <WorkoutExerciseCard
+                    key={templateExercise.exercise.id}
+                    workoutExercise={{
+                      id: templateExercise.exercise.id,
+                      exercise: templateExercise.exercise,
+                      order: templateExercise.order,
+                      sets: Array.from({ length: templateExercise.default_sets }, (_, i) => ({
+                        id: `temp-set-${i}`,
+                        exercise_id: templateExercise.exercise.id,
+                        set_type: templateExercise.default_set_types?.[i] || 'WORKING',
+                        weight: 0,
+                        reps: typeof templateExercise.default_reps === 'number' ? templateExercise.default_reps : (templateExercise.default_reps[i] as any)?.min || 0,
+                        is_completed: false,
+                      } as WorkoutSet)),
+                    }}
+                    onDelete={() => {}}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
 
@@ -130,15 +169,44 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
       {template.exercises.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pb-4">
           <div className="max-w-lg mx-auto">
-            <Button
-              onClick={handleStartWorkout}
-              className="w-full h-14 text-lg font-semibold"
-              style={{ borderRadius: "var(--radius)" }}
-              disabled={!!activeWorkout}
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Start Exercise
-            </Button>
+            {activeWorkout ? (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    className="w-full h-14 text-lg font-semibold"
+                    style={{ borderRadius: "var(--radius)" }}
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Start Exercise
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Start New Workout?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      An active workout ({activeWorkout.name}) is in progress.
+                      Starting this workout will discard your current progress.
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleStartWorkout}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <Button
+                onClick={handleStartWorkout}
+                className="w-full h-14 text-lg font-semibold"
+                style={{ borderRadius: "var(--radius)" }}
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Start Exercise
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -275,7 +343,7 @@ export default function WorkoutOverview() {
   if (isLoading || isTemplateLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading... (Template Loading: {isTemplateLoading.toString()})</p>
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -511,3 +579,4 @@ function BottomNav() {
     </nav>
   );
 }
+

@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Play, Dumbbell } from 'lucide-react';
+import { Plus, ArrowRight, Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGetTemplatesQuery } from '@/store/api/templateApi';
-import { useStartWorkoutMutation, useGetActiveWorkoutQuery } from '@/store/api/activeWorkoutApi';
+import { useGetActiveWorkoutQuery } from '@/store/api/activeWorkoutApi';
 import { TemplateTag, TEMPLATE_TAG_LABELS, WorkoutSet } from '@/types/workout';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { toggleTemplateTag, setActiveExerciseId } from '@/store/slices/uiSlice';
+import { toggleTemplateTag, setActiveExerciseId, setPendingTemplateId } from '@/store/slices/uiSlice';
 import { cn } from '@/lib/utils';
 
 export default function Templates() {
@@ -16,37 +16,9 @@ export default function Templates() {
     selectedTags.length > 0 ? { tags: selectedTags } : undefined
   );
   const { data: activeWorkout } = useGetActiveWorkoutQuery();
-  const [startWorkout] = useStartWorkoutMutation();
 
-  const handleStartFromTemplate = async (templateId: string, templateName: string) => {
-    const template = templates.find(t => t.id === templateId);
-    if (!template) return;
-
-    // Convert template exercises to workout exercises
-    const workoutExercises = template.exercises.map((te, index) => ({
-      id: `temp-${index}`,
-      exercise: te.exercise,
-      order: te.order,
-      sets: Array.from({ length: te.default_sets }, (_, i) => ({
-        id: `temp-set-${index}-${i}`,
-        exercise_id: te.exercise.id,
-        set_type: te.default_set_types?.[i] || 'WORKING',
-        weight: 0,
-        reps: typeof te.default_reps === 'number' ? te.default_reps : te.default_reps?.min || 0,
-        is_completed: false,
-      } as WorkoutSet)),
-    }));
-
-    const result = await startWorkout({ 
-      name: templateName, 
-      template_id: templateId,
-      exercises: workoutExercises,
-    });
-
-    if ('data' in result && result.data?.exercises?.[0]) {
-      dispatch(setActiveExerciseId(result.data.exercises[0].id));
-    }
-    
+  const handleStartFromTemplate = async (templateId: string) => {
+    dispatch(setPendingTemplateId(templateId));
     navigate('/workout/active');
   };
 
@@ -114,13 +86,11 @@ export default function Templates() {
                     )}
                   </div>
                   <Button
-                    variant="outline"
                     size="icon"
-                    onClick={() => handleStartFromTemplate(template.id, template.name)}
-                    disabled={!!activeWorkout}
-                    className="shrink-0 border-primary"
+                    onClick={() => handleStartFromTemplate(template.id)}
+                    className="shrink-0"
                   >
-                    <Play className="w-5 h-5 text-primary" />
+                    <ArrowRight className="w-5 h-5" />
                   </Button>
                 </div>
 
@@ -168,7 +138,7 @@ function BottomNav() {
           <span className="text-xs font-medium">Templates</span>
         </Link>
         <Link to="/workout/active" className="nav-link flex-1">
-          <Play className="w-5 h-5" />
+          <Dumbbell className="w-5 h-5" />
           <span className="text-xs font-medium">Workout</span>
         </Link>
         <Link to="/exercises" className="nav-link flex-1">
