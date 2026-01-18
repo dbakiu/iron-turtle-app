@@ -1,466 +1,2130 @@
-import { WorkoutTemplate, TemplateExercise } from '@/types/workout';
+import { WorkoutTemplate } from '@/types/workout';
 import { presetExercises } from './presetExercises';
 
 const getExerciseById = (id: string) => presetExercises.find(e => e.id === id)!;
 
-export const sampleTemplates: WorkoutTemplate[] = [
+const templates: Omit<WorkoutTemplate, 'exercises'> & { exercises: { exercise_id: string, default_sets: number, default_reps: any, order: number }[] }[] = [
   {
-    id: 'template-push',
-    name: 'Push Day',
-    description: 'Chest, shoulders, and triceps focused workout',
-    tags: ['PUSH', 'UPPER'],
-    exercises: [
-      {
-        exercise_id: 'preset-bench-press',
-        exercise: getExerciseById('preset-bench-press'),
-        default_sets: 4,
-        default_reps: { min: 6, max: 8 },
-        default_set_types: ['WARMUP', 'WORKING', 'WORKING', 'WORKING'],
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-incline-db-press',
-        exercise: getExerciseById('preset-incline-db-press'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 12 },
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-ohp',
-        exercise: getExerciseById('preset-ohp'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-lateral-raise',
-        exercise: getExerciseById('preset-lateral-raise'),
-        default_sets: 3,
-        default_reps: { min: 12, max: 15 },
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-tricep-pushdown',
-        exercise: getExerciseById('preset-tricep-pushdown'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 4,
-      },
+    "id": "template-fb-full-body-1",
+    "name": "FB: Full Body #1",
+    "description": "Full Body #1 workout",
+    "tags": [
+      "FULL_BODY"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-cross-body-lat-pull-around",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-low-incline-smith-machine-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-machine-hip-adduction",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-leg-press",
+        "default_sets": 3,
+        "default_reps": [
+          8,
+          8,
+          8
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-lying-paused-rope-face-pull",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      }
+    ]
   },
   {
-    id: 'template-pull',
-    name: 'Pull Day',
-    description: 'Back and biceps focused workout',
-    tags: ['PULL', 'UPPER'],
-    exercises: [
-      {
-        exercise_id: 'preset-deadlift',
-        exercise: getExerciseById('preset-deadlift'),
-        default_sets: 4,
-        default_reps: { min: 5, max: 6 },
-        default_set_types: ['WARMUP', 'WARMUP', 'WORKING', 'WORKING'],
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-barbell-row',
-        exercise: getExerciseById('preset-barbell-row'),
-        default_sets: 4,
-        default_reps: { min: 8, max: 10 },
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-lat-pulldown',
-        exercise: getExerciseById('preset-lat-pulldown'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-face-pull',
-        exercise: getExerciseById('preset-face-pull'),
-        default_sets: 3,
-        default_reps: { min: 15, max: 20 },
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-barbell-curl',
-        exercise: getExerciseById('preset-barbell-curl'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 4,
-      },
+    "id": "template-fb-full-body-2",
+    "name": "FB: Full Body #2",
+    "description": "Full Body #2 workout",
+    "tags": [
+      "FULL_BODY"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-db-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-assisted-pull-up",
+        "default_sets": 4,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-lying-leg-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-chest-supported-machine-row",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-slow-eccentric-db-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      }
+    ]
   },
   {
-    id: 'template-legs',
-    name: 'Leg Day',
-    description: 'Complete lower body workout',
-    tags: ['LEGS', 'LOWER'],
-    exercises: [
-      {
-        exercise_id: 'preset-squat',
-        exercise: getExerciseById('preset-squat'),
-        default_sets: 4,
-        default_reps: { min: 6, max: 8 },
-        default_set_types: ['WARMUP', 'WARMUP', 'WORKING', 'WORKING'],
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-rdl',
-        exercise: getExerciseById('preset-rdl'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-leg-press',
-        exercise: getExerciseById('preset-leg-press'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-leg-curl',
-        exercise: getExerciseById('preset-leg-curl'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-leg-extension',
-        exercise: getExerciseById('preset-leg-extension'),
-        default_sets: 3,
-        default_reps: { min: 12, max: 15 },
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-calf-raise',
-        exercise: getExerciseById('preset-calf-raise'),
-        default_sets: 4,
-        default_reps: { min: 12, max: 15 },
-        order: 5,
-      },
+    "id": "template-fb-full-body-3",
+    "name": "FB: Full Body #3",
+    "description": "Full Body #3 workout",
+    "tags": [
+      "FULL_BODY"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-neutral-grip-pullup",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-low-incline-db-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-copenhagen-hip-adduction",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-high-bar-back-squat",
+        "default_sets": 3,
+        "default_reps": [
+          8,
+          8,
+          8
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-bent-over-reverse-db-flye",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-plate-weighted-crunch",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
   },
   {
-    id: 'template-upper',
-    name: 'Upper Body',
-    description: 'Balanced upper body push and pull',
-    tags: ['UPPER', 'FULL_BODY'],
-    exercises: [
-      {
-        exercise_id: 'preset-bench-press',
-        exercise: getExerciseById('preset-bench-press'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-barbell-row',
-        exercise: getExerciseById('preset-barbell-row'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-ohp',
-        exercise: getExerciseById('preset-ohp'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-lat-pulldown',
-        exercise: getExerciseById('preset-lat-pulldown'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-lateral-raise',
-        exercise: getExerciseById('preset-lateral-raise'),
-        default_sets: 3,
-        default_reps: { min: 12, max: 15 },
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-tricep-pushdown',
-        exercise: getExerciseById('preset-tricep-pushdown'),
-        default_sets: 2,
-        default_reps: { min: 12, max: 15 },
-        order: 5,
-      },
-      {
-        exercise_id: 'preset-db-curl',
-        exercise: getExerciseById('preset-db-curl'),
-        default_sets: 2,
-        default_reps: { min: 12, max: 15 },
-        order: 6,
-      },
+    "id": "template-fb-arms-weak-points",
+    "name": "FB: Arms & Weak Points",
+    "description": "Arms & Weak Points workout",
+    "tags": [
+      "ARMS"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-db-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-bent-over-reverse-db-flye",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-ez-bar-skull-crusher",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-concentration-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-triceps-pressdown-rope-",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-hammer-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
   },
   {
-    id: 'template-full-body',
-    name: 'Full Body',
-    description: 'Complete full body training session',
-    tags: ['FULL_BODY'],
-    exercises: [
-      {
-        exercise_id: 'preset-squat',
-        exercise: getExerciseById('preset-squat'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-bench-press',
-        exercise: getExerciseById('preset-bench-press'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-barbell-row',
-        exercise: getExerciseById('preset-barbell-row'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-ohp',
-        exercise: getExerciseById('preset-ohp'),
-        default_sets: 3,
-        default_reps: { min: 8, max: 10 },
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-rdl',
-        exercise: getExerciseById('preset-rdl'),
-        default_sets: 3,
-        default_reps: { min: 10, max: 12 },
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-plank',
-        exercise: getExerciseById('preset-plank'),
-        default_sets: 3,
-        default_reps: 60, // 60 seconds duration
-        order: 5,
-      },
+    "id": "template-mnmx4-lower-1",
+    "name": "MNMX4: Lower #1",
+    "description": "Lower #1 workout",
+    "tags": [
+      "LEGS",
+      "LOWER"
     ],
-  },
-  // New Full Body Template
-  {
-    id: 'template-full-body-new',
-    name: 'Full Body Workout (Advanced)',
-    description: 'A comprehensive full body workout targeting major muscle groups with newly added exercises.',
-    tags: ['FULL_BODY', 'ADVANCED'],
-    exercises: [
+    "exercises": [
       {
-        exercise_id: 'preset-lying-leg-curl-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-lying-leg-curl-fb')!,
-        default_sets: 2,
-        default_reps: 6,
-        default_set_types: ['WORKING', 'WORKING'],
-        order: 0,
+        "exercise_id": "preset-nordic-ham-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 6,
+            "max": 10
+          },
+          {
+            "min": 6,
+            "max": 10
+          }
+        ],
+        "order": 0
       },
       {
-        exercise_id: 'preset-squat-choice-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-squat-choice-fb')!,
-        default_sets: 2,
-        default_reps: 6,
-        default_set_types: ['WORKING', 'WORKING'],
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-barbell-incline-press-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-barbell-incline-press-fb')!,
-        default_sets: 2,
-        default_reps: 6,
-        default_set_types: ['WORKING', 'WORKING'],
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-incline-db-y-raise-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-incline-db-y-raise-fb')!,
-        default_sets: 1,
-        default_reps: 8,
-        default_set_types: ['WORKING'],
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-pull-up-wide-grip-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-pull-up-wide-grip-fb')!,
-        default_sets: 2,
-        default_reps: 6,
-        default_set_types: ['WORKING', 'WORKING'],
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-standing-calf-raise-fb',
-        exercise: presetExercises.find(ex => ex.id === 'preset-standing-calf-raise-fb')!,
-        default_sets: 1,
-        default_reps: 6,
-        default_set_types: ['WORKING'],
-        order: 5,
-      },
-    ],
+        "exercise_id": "preset-leg-press",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 1
+      }
+    ]
   },
   {
-    id: 'template-training-3',
-    name: 'Training 3',
-    description: 'Glute and shoulder focused training.',
-    tags: ['FULL_BODY'],
-    exercises: [
-      {
-        exercise_id: 'preset-step-outs',
-        exercise: getExerciseById('preset-step-outs'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-wrist-curl',
-        exercise: getExerciseById('preset-wrist-curl'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-reverse-wrist-curl',
-        exercise: getExerciseById('preset-reverse-wrist-curl'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-glute-focused-deficit-lunge',
-        exercise: getExerciseById('preset-glute-focused-deficit-lunge'),
-        default_sets: 3,
-        default_reps: 15, // Using the higher rep count
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-glute-focused-cable-kickback',
-        exercise: getExerciseById('preset-glute-focused-cable-kickback'),
-        default_sets: 3,
-        default_reps: 15,
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-glute-focused-dumbbell-deadlift',
-        exercise: getExerciseById('preset-glute-focused-dumbbell-deadlift'),
-        default_sets: 3,
-        default_reps: 12,
-        order: 5,
-      },
-      {
-        exercise_id: 'preset-seated-shoulder-rotation',
-        exercise: getExerciseById('preset-seated-shoulder-rotation'),
-        default_sets: 4,
-        default_reps: 12,
-        order: 6,
-      },
-      {
-        exercise_id: 'preset-seated-shoulder-press',
-        exercise: getExerciseById('preset-seated-shoulder-press'),
-        default_sets: 3,
-        default_reps: 10,
-        order: 7,
-      },
-      {
-        exercise_id: 'preset-glute-focused-cable-sidekick',
-        exercise: getExerciseById('preset-glute-focused-cable-sidekick'),
-        default_sets: 3,
-        default_reps: 15,
-        order: 8,
-      },
+    "id": "template-mnmx4-upper-1",
+    "name": "MNMX4: Upper #1",
+    "description": "Upper #1 workout",
+    "tags": [
+      "UPPER"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-db-incline-press",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-machine-lateral-raise",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-1-arm-cable-pulldown",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      }
+    ]
   },
   {
-    id: 'template-training-2',
-    name: 'Training 2',
-    description: 'A full body workout with a focus on unilateral movements and core strength.',
-    tags: ['FULL_BODY', 'UNILATERAL'],
-    exercises: [
-      {
-        exercise_id: 'preset-cycling',
-        exercise: getExerciseById('preset-cycling'),
-        default_sets: 1,
-        default_reps: 600, // 10 minutes in seconds
-        order: 0,
-      },
-      {
-        exercise_id: 'preset-step-outs',
-        exercise: getExerciseById('preset-step-outs'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 1,
-      },
-      {
-        exercise_id: 'preset-wrist-curl',
-        exercise: getExerciseById('preset-wrist-curl'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 2,
-      },
-      {
-        exercise_id: 'preset-reverse-wrist-curl',
-        exercise: getExerciseById('preset-reverse-wrist-curl'),
-        default_sets: 3,
-        default_reps: 20,
-        order: 3,
-      },
-      {
-        exercise_id: 'preset-walking-lunges-jeff-nippard',
-        exercise: getExerciseById('preset-walking-lunges-jeff-nippard'),
-        default_sets: 3,
-        default_reps: 24,
-        order: 4,
-      },
-      {
-        exercise_id: 'preset-single-leg-seated-cable-deadlift',
-        exercise: getExerciseById('preset-single-leg-seated-cable-deadlift'),
-        default_sets: 3,
-        default_reps: 12,
-        order: 5,
-      },
-      {
-        exercise_id: 'preset-chest-supported-kelso-shrug',
-        exercise: getExerciseById('preset-chest-supported-kelso-shrug'),
-        default_sets: 3,
-        default_reps: 15,
-        order: 6,
-      },
-      {
-        exercise_id: 'preset-incline-db-y-raise-fb',
-        exercise: getExerciseById('preset-incline-db-y-raise-fb'),
-        default_sets: 3,
-        default_reps: 12,
-        order: 7,
-      },
-      {
-        exercise_id: 'preset-dragon-flags',
-        exercise: getExerciseById('preset-dragon-flags'),
-        default_sets: 3,
-        default_reps: -1, // To failure
-        order: 8,
-      },
-      {
-        exercise_id: 'preset-glute-medius-cable-kickback',
-        exercise: getExerciseById('preset-glute-medius-cable-kickback'),
-        default_sets: 3,
-        default_reps: 15,
-        order: 9,
-      },
-      {
-        exercise_id: 'preset-dead-hang',
-        exercise: getExerciseById('preset-dead-hang'),
-        default_sets: 3,
-        default_reps: -1, // Max time
-        order: 10,
-      },
+    "id": "template-mnmx4-lower-2",
+    "name": "MNMX4: Lower #2",
+    "description": "Lower #2 workout",
+    "tags": [
+      "LEGS",
+      "LOWER"
     ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-leg-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      }
+    ]
   },
-];
+  {
+    "id": "template-mnmx4-upper-2",
+    "name": "MNMX4: Upper #2",
+    "description": "Upper #2 workout",
+    "tags": [
+      "UPPER"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-smith-machine-incline-press",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-cable-y-raise",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-lat-pulldown-wide-grip-",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      }
+    ]
+  },
+  {
+    "id": "template-mnmx4-arms",
+    "name": "MNMX4: Arms",
+    "description": "Arms workout",
+    "tags": [
+      "ARMS"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-standing-db-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-skull-crusher",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "template-mnmx5-full-body-1",
+    "name": "MNMX5: Full Body #1",
+    "description": "Full Body #1 workout",
+    "tags": [
+      "FULL_BODY"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-1-arm-cable-pulldown",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-chest-supported-db-row",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-db-bench-press",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-machine-lateral-raise",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-machine-crunch",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "template-mnmx5-full-body-2",
+    "name": "MNMX5: Full Body #2",
+    "description": "Full Body #2 workout",
+    "tags": [
+      "FULL_BODY"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-close-grip-pull-up",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-chest-supported-machine-row",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-smith-machine-bench-press",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-db-lateral-raise",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-weighted-crunch",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-pull-1-lat-focused-",
+    "name": "PPL: Pull #1 (Lat Focused)",
+    "description": "Pull #1 (Lat Focused) workout",
+    "tags": [
+      "PULL"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-cross-body-lat-pull-around",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-snatch-grip-rdl",
+        "default_sets": 2,
+        "default_reps": [
+          8,
+          8
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-chest-supported-machine-row",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-straight-bar-lat-prayer",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-hammer-preacher-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-lying-paused-rope-face-pull",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-push-1",
+    "name": "PPL: Push #1",
+    "description": "Push #1 workout",
+    "tags": [
+      "PUSH"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-cuffed-behind-the-back-lateral-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-low-incline-smith-machine-press",
+        "default_sets": 4,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-pec-deck-w-integrated-partials-",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-overhead-cable-triceps-extension-bar-",
+        "default_sets": 3,
+        "default_reps": [
+          8,
+          8,
+          8
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-triceps-pressdown-bar-",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-cable-crunch",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-legs-1",
+    "name": "PPL: Legs #1",
+    "description": "Legs #1 workout",
+    "tags": [
+      "LEGS"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-leg-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-machine-hip-adduction",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-hack-squat",
+        "default_sets": 3,
+        "default_reps": [
+          [
+            4,
+            6,
+            8
+          ],
+          [
+            4,
+            6,
+            8
+          ],
+          [
+            4,
+            6,
+            8
+          ]
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-leg-extension",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-leg-press-calf-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-arms-weak-points-1",
+    "name": "PPL: Arms & Weak Points #1",
+    "description": "Arms & Weak Points #1 workout",
+    "tags": [
+      "ARMS"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-db-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-bent-over-reverse-db-flye",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-bayesian-cable-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-seated-db-french-press",
+        "default_sets": 3,
+        "default_reps": [
+          10,
+          10,
+          10
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-bottom-2-3-constant-tension-preacher-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-cable-triceps-kickback",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 5
+      },
+      {
+        "exercise_id": "preset-roman-chair-leg-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 20
+          },
+          {
+            "min": 10,
+            "max": 20
+          },
+          {
+            "min": 10,
+            "max": 20
+          }
+        ],
+        "order": 6
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-pull-2-mid-back-focused-",
+    "name": "PPL: Pull #2 (Mid-Back Focused)",
+    "description": "Pull #2 (Mid-Back Focused) workout",
+    "tags": [
+      "PULL"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-super-rom-overhand-cable-row",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-arms-extended-45-hyperextension",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 20
+          },
+          {
+            "min": 10,
+            "max": 20
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-lean-back-lat-pulldown",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-inverse-db-zottman-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-cable-reverse-flye-mechanical-dropset-",
+        "default_sets": 3,
+        "default_reps": [
+          null,
+          null,
+          null
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-cable-paused-shrug-in",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "template-ppl-push-2",
+    "name": "PPL: Push #2",
+    "description": "Push #2 workout",
+    "tags": [
+      "PUSH"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-db-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-db-lateral-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-decline-barbell-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-pec-deck",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 15,
+            "max": 20
+          },
+          {
+            "min": 15,
+            "max": 20
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-db-french-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-llpt-plank",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 20
+          },
+          {
+            "min": 10,
+            "max": 20
+          },
+          {
+            "min": 10,
+            "max": 20
+          }
+        ],
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "template-ul-upper-1",
+    "name": "UL: Upper #1",
+    "description": "Upper #1 workout",
+    "tags": [
+      "UPPER"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-cuffed-behind-the-back-lateral-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-cross-body-lat-pull-around",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-low-incline-smith-machine-press",
+        "default_sets": 4,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-chest-supported-machine-row",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-overhead-cable-triceps-extension-bar-",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-straight-bar-lat-prayer",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 5
+      },
+      {
+        "exercise_id": "preset-pec-deck-w-integrated-partials-",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 6
+      }
+    ]
+  },
+  {
+    "id": "template-ul-lower-1",
+    "name": "UL: Lower #1",
+    "description": "Lower #1 workout",
+    "tags": [
+      "LEGS",
+      "LOWER"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-leg-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-machine-hip-adduction",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-hack-squat",
+        "default_sets": 3,
+        "default_reps": [
+          [
+            4,
+            6,
+            8
+          ],
+          [
+            4,
+            6,
+            8
+          ],
+          [
+            4,
+            6,
+            8
+          ]
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-leg-extension",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-leg-press-calf-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "template-ul-upper-2",
+    "name": "UL: Upper #2",
+    "description": "Upper #2 workout",
+    "tags": [
+      "UPPER"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-super-rom-overhand-cable-row",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-machine-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-assisted-pull-up",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-paused-assisted-dip",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-inverse-db-zottman-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-super-rom-db-lateral-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 5
+      },
+      {
+        "exercise_id": "preset-cable-reverse-flye-mechanical-dropset-",
+        "default_sets": 3,
+        "default_reps": [
+          null,
+          null,
+          null
+        ],
+        "order": 6
+      }
+    ]
+  },
+  {
+    "id": "template-ul-lower-2",
+    "name": "UL: Lower #2",
+    "description": "Lower #2 workout",
+    "tags": [
+      "LEGS",
+      "LOWER"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-lying-leg-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          },
+          {
+            "min": 8,
+            "max": 10
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-leg-press",
+        "default_sets": 3,
+        "default_reps": [
+          8,
+          8,
+          8
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-paused-barbell-rdl",
+        "default_sets": 2,
+        "default_reps": [
+          8,
+          8
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-machine-hip-adduction",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-sissy-squat",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-standing-calf-raise",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "template-ul-arms-weak-points",
+    "name": "UL: Arms & Weak Points",
+    "description": "Arms & Weak Points workout",
+    "tags": [
+      "ARMS"
+    ],
+    "exercises": [
+      {
+        "exercise_id": "preset-seated-db-shoulder-press",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 0
+      },
+      {
+        "exercise_id": "preset-bent-over-reverse-db-flye",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 8,
+            "max": 12
+          },
+          {
+            "min": 8,
+            "max": 12
+          }
+        ],
+        "order": 1
+      },
+      {
+        "exercise_id": "preset-bayesian-cable-curl",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 2
+      },
+      {
+        "exercise_id": "preset-seated-db-press",
+        "default_sets": 3,
+        "default_reps": [
+          10,
+          10,
+          10
+        ],
+        "order": 3
+      },
+      {
+        "exercise_id": "preset-bottom-2-3-ct-preacher-curl",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 4
+      },
+      {
+        "exercise_id": "preset-cable-triceps-kickback",
+        "default_sets": 2,
+        "default_reps": [
+          {
+            "min": 12,
+            "max": 15
+          },
+          {
+            "min": 12,
+            "max": 15
+          }
+        ],
+        "order": 5
+      },
+      {
+        "exercise_id": "preset-cable-crunch",
+        "default_sets": 3,
+        "default_reps": [
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          },
+          {
+            "min": 10,
+            "max": 12
+          }
+        ],
+        "order": 6
+      }
+    ]
+  }
+]
+
+export const sampleTemplates: WorkoutTemplate[] = templates.map(template => ({
+    ...template,
+    exercises: template.exercises.map(exercise => ({
+        ...exercise,
+        exercise: getExerciseById(exercise.exercise_id),
+    })),
+}));

@@ -10,11 +10,15 @@ import {
   useReorderExercisesMutation,
   useRemoveExerciseFromWorkoutMutation,
 } from "@/store/api/activeWorkoutApi";
+import { useGetTemplateByIdQuery } from "@/store/api/templateApi";
 import { useSaveCompletedWorkoutMutation } from "@/store/api/historyApi";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   tickWorkoutDuration,
   resetWorkoutDuration,
+  startWorkoutTimer,
+  setPendingTemplateId,
+  setActiveExerciseId,
 } from "@/store/slices/uiSlice";
 import {
   AlertDialog,
@@ -52,6 +56,97 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
+import { WorkoutSet, WorkoutTemplate } from "@/types/workout";
+
+function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [startWorkout] = useStartWorkoutMutation();
+  const { data: activeWorkout } = useGetActiveWorkoutQuery();
+
+  const handleStartWorkout = async () => {
+    // Convert template exercises to workout exercises
+    const workoutExercises = template.exercises.map((te, index) => ({
+      id: `temp-${index}`,
+      exercise: te.exercise,
+      order: te.order,
+      sets: Array.from({ length: te.default_sets }, (_, i) => ({
+        id: `temp-set-${index}-${i}`,
+        exercise_id: te.exercise.id,
+        set_type: te.default_set_types?.[i] || 'WORKING',
+        weight: 0,
+        reps: typeof te.default_reps === 'number' ? te.default_reps : (te.default_reps[i] as any)?.min || 0,
+        is_completed: false,
+      } as WorkoutSet)),
+    }));
+
+    const result = await startWorkout({ 
+      name: template.name, 
+      template_id: template.id,
+      exercises: workoutExercises,
+    });
+
+    if ('data' in result && result.data?.exercises?.[0]) {
+      dispatch(startWorkoutTimer());
+      dispatch(setPendingTemplateId(null));
+      dispatch(setActiveExerciseId(result.data.exercises[0].id));
+      navigate(`/workout/active/exercise/${result.data.exercises[0].id}`);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="p-4 space-y-4 max-w-lg mx-auto pb-44">
+        {/* Header */}
+        <header className="pt-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl font-bold">{template.name}</h1>
+          </div>
+          <p className="text-muted-foreground">{template.description}</p>
+        </header>
+
+        {/* Exercise List */}
+        <div className="space-y-4">
+          <div className="space-y-3">
+            {template.exercises.map((templateExercise) => (
+              <div key={templateExercise.exercise.id} className="stat-card p-4">
+                <h3 className="font-semibold">{templateExercise.exercise.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {templateExercise.default_sets} sets x {
+                    typeof templateExercise.default_reps === 'number'
+                      ? templateExercise.default_reps
+                      : Array.isArray(templateExercise.default_reps)
+                        ? templateExercise.default_reps.map(r => (r as any).min ? `${(r as any).min}-${(r as any).max}` : r).join(', ')
+                        : ''
+                  } reps
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Action Button */}
+      {template.exercises.length > 0 && (
+        <div className="fixed bottom-20 left-0 right-0 z-40 px-4 pb-4">
+          <div className="max-w-lg mx-auto">
+            <Button
+              onClick={handleStartWorkout}
+              className="w-full h-14 text-lg font-semibold"
+              style={{ borderRadius: "var(--radius)" }}
+              disabled={!!activeWorkout}
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Start Exercise
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <BottomNav />
+    </div>
+  )
+}
 
 export default function WorkoutOverview() {
   const navigate = useNavigate();
@@ -65,6 +160,11 @@ export default function WorkoutOverview() {
   const [saveCompletedWorkout] = useSaveCompletedWorkoutMutation();
   const [reorderExercises] = useReorderExercisesMutation();
   const [removeExerciseFromWorkout] = useRemoveExerciseFromWorkoutMutation();
+  
+  const { pendingTemplateId } = useAppSelector((state) => state.ui);
+  const { data: pendingTemplate, isLoading: isTemplateLoading } = useGetTemplateByIdQuery(pendingTemplateId!, {
+    skip: !pendingTemplateId,
+  });
 
   // DND
   const sensors = useSensors(
@@ -106,12 +206,11 @@ export default function WorkoutOverview() {
     });
   };
 
-  const { workoutDuration } = useAppSelector((state) => state.ui);
+  const { workoutDuration, isWorkoutTimerRunning } = useAppSelector((state) => state.ui);
 
   // Duration timer
   useEffect(() => {
-    if (!activeWorkout) {
-      dispatch(resetWorkoutDuration());
+    if (!activeWorkout || !isWorkoutTimerRunning) {
       return;
     }
 
@@ -120,7 +219,7 @@ export default function WorkoutOverview() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeWorkout, dispatch]);
+  }, [activeWorkout, isWorkoutTimerRunning, dispatch]);
 
   const handleStartEmptyWorkout = async () => {
     await startWorkout({ name: "New Workout" });
@@ -158,6 +257,7 @@ export default function WorkoutOverview() {
 
   const handleDiscardWorkout = async () => {
     await discardWorkout();
+    dispatch(setPendingTemplateId(null));
     navigate("/");
   };
 
@@ -172,12 +272,24 @@ export default function WorkoutOverview() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  if (isLoading) {
+  if (isLoading || isTemplateLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">Loading... (Template Loading: {isTemplateLoading.toString()})</p>
       </div>
     );
+  }
+
+  if (pendingTemplateId && !pendingTemplate) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Template with id {pendingTemplateId} not found</p>
+      </div>
+    );
+  }
+
+  if (pendingTemplateId && pendingTemplate) {
+    return <PendingWorkoutView template={pendingTemplate} />;
   }
 
   if (!activeWorkout) {
@@ -355,6 +467,7 @@ export default function WorkoutOverview() {
                     (ex) => !ex.sets.every((set) => set.is_completed),
                   );
                   if (firstUncompleted) {
+                    dispatch(startWorkoutTimer());
                     navigate(`/workout/active/exercise/${firstUncompleted.id}`);
                   }
                 }}

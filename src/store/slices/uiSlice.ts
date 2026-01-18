@@ -33,7 +33,9 @@ interface UiState {
   restTimer: RestTimerState;
   overlays: OverlaysState;
   workoutDuration: number; // Seconds since workout started (UI-tracked)
+  isWorkoutTimerRunning: boolean;
   activeExerciseId: string | null;
+  pendingTemplateId: string | null;
 }
 
 const initialState: UiState = {
@@ -57,7 +59,9 @@ const initialState: UiState = {
     exerciseSwap: { isOpen: false, exerciseId: null },
   },
   workoutDuration: 0,
+  isWorkoutTimerRunning: false,
   activeExerciseId: null,
+  pendingTemplateId: null,
 };
 
 const uiSlice = createSlice({
@@ -69,6 +73,9 @@ const uiSlice = createSlice({
     // Active exercise
     setActiveExerciseId: (state, action: PayloadAction<string | null>) => {
       state.activeExerciseId = action.payload;
+    },
+    setPendingTemplateId: (state, action: PayloadAction<string | null>) => {
+      state.pendingTemplateId = action.payload;
     },
     
     // Exercise filters
@@ -176,12 +183,20 @@ const uiSlice = createSlice({
     },
     resetWorkoutDuration: (state) => {
       state.workoutDuration = 0;
+      state.isWorkoutTimerRunning = false;
+    },
+    startWorkoutTimer: (state) => {
+      state.isWorkoutTimerRunning = true;
+    },
+    stopWorkoutTimer: (state) => {
+      state.isWorkoutTimerRunning = false;
     },
   },
 });
 
 export const {
   setActiveExerciseId,
+  setPendingTemplateId,
   setExerciseMuscleGroupFilter,
   setExerciseMovementPatternFilter,
   setExerciseEquipmentFilter,
@@ -205,6 +220,8 @@ export const {
   closeExerciseSwap,
   tickWorkoutDuration,
   resetWorkoutDuration,
+  startWorkoutTimer,
+  stopWorkoutTimer,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
