@@ -263,8 +263,8 @@ function ExerciseListItem({ exercise, onAdd, showAddButton }: ExerciseListItemPr
   return (
     <div className="stat-card hover:bg-accent/30 transition-colors">
       <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <h3 className="font-semibold">{exercise.name}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold truncate">{exercise.name}</h3>
           
           <div className="flex flex-wrap gap-1.5 mt-2">
             <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">

@@ -118,8 +118,8 @@ export default function Dashboard() {
         {/* Quick Links */}
         <section>
           <h2 className="text-lg font-semibold mb-3">Quick Actions</h2>
-          <div className="space-y-2">
-            <Link to="/templates">
+          <div>
+            <Link to="/templates" className="block">
               <div className="stat-card flex items-center justify-between hover:bg-accent/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div
@@ -139,7 +139,7 @@ export default function Dashboard() {
               </div>
             </Link>
 
-            <Link to="/exercises">
+            <Link to="/exercises" className="block mt-2">
               <div className="stat-card flex items-center justify-between hover:bg-accent/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div

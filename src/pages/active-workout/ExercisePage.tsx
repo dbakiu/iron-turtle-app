@@ -174,7 +174,7 @@ export default function ExercisePage() {
                   <Button
                     variant="default"
                     size="lg"
-                    className="w-full h-12 text-lg mt-2"
+                    className="w-full h-12 text-lg mt-2 overflow-hidden whitespace-nowrap text-ellipsis"
                     onClick={() => {
                       const nextExercise = activeWorkout.exercises[currentIndex + 1];
                       if (nextExercise) {
@@ -190,7 +190,7 @@ export default function ExercisePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="w-full h-12 text-lg mt-2"
+                    className="w-full h-12 text-lg mt-2 overflow-hidden whitespace-nowrap text-ellipsis"
                     onClick={() => navigate('/workout/active')}
                   >
                     Back to Overview
