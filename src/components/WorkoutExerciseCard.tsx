@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CheckCircle2, MoreVertical, GripVertical, Dumbbell } from "lucide-react";
+import {
+  CheckCircle2,
+  MoreVertical,
+  GripVertical,
+  Dumbbell,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,7 +66,7 @@ export default function WorkoutExerciseCard({
         className="flex-grow flex items-center gap-3 py-3"
       >
         <div className="flex-grow">
-          <h3 className="font-semibold text-base truncate">
+          <h3 className="font-semibold text-base">
             {workoutExercise.exercise.name}
           </h3>
           {workoutExercise.exercise.primary_muscle_group && (
@@ -74,9 +79,7 @@ export default function WorkoutExerciseCard({
         </div>
       </Link>
       <div className="flex items-center gap-2 pr-3">
-        {isCompleted && (
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
-        )}
+        {isCompleted && <CheckCircle2 className="h-5 w-5 text-green-500" />}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">

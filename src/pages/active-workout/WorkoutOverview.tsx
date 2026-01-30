@@ -80,42 +80,53 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setPendingExercises((items) => {
-        const oldIndex = items.findIndex((item) => item.exercise.id === active.id);
-        const newIndex = items.findIndex((item) => item.exercise.id === over.id);
+        const oldIndex = items.findIndex(
+          (item) => item.exercise.id === active.id,
+        );
+        const newIndex = items.findIndex(
+          (item) => item.exercise.id === over.id,
+        );
         return arrayMove(items, oldIndex, newIndex);
       });
     }
   };
-  
+
   const handleStartWorkout = async () => {
     // Convert template exercises to workout exercises
     const workoutExercises = pendingExercises.map((te, index) => ({
       id: `temp-${index}`,
       exercise: te.exercise,
       order: index,
-      sets: Array.from({ length: te.default_sets }, (_, i) => ({
-        id: `temp-set-${index}-${i}`,
-        exercise_id: te.exercise.id,
-        set_type: te.default_set_types?.[i] || 'WORKING',
-        weight: 0,
-        reps: typeof te.default_reps === 'number' ? te.default_reps : (te.default_reps[i] as any)?.min || 0,
-        is_completed: false,
-      } as WorkoutSet)),
+      sets: Array.from(
+        { length: te.default_sets },
+        (_, i) =>
+          ({
+            id: `temp-set-${index}-${i}`,
+            exercise_id: te.exercise.id,
+            set_type: te.default_set_types?.[i] || "WORKING",
+            weight: 0,
+            reps:
+              typeof te.default_reps === "number"
+                ? te.default_reps
+                : (te.default_reps[i] as any)?.min || 0,
+            is_completed: false,
+          }) as WorkoutSet,
+      ),
     }));
 
-    const result = await startWorkout({ 
-      name: template.name, 
+    const result = await startWorkout({
+      name: template.name,
       template_id: template.id,
       exercises: workoutExercises,
     });
 
-    if ('data' in result && result.data?.exercises?.[0]) {
+    if ("data" in result && result.data?.exercises?.[0]) {
       dispatch(startWorkoutTimer());
       dispatch(setPendingTemplateId(null));
       dispatch(setActiveExerciseId(result.data.exercises[0].id));
       navigate(`/workout/active/exercise/${result.data.exercises[0].id}`);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -147,14 +158,24 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
                       id: templateExercise.exercise.id,
                       exercise: templateExercise.exercise,
                       order: templateExercise.order,
-                      sets: Array.from({ length: templateExercise.default_sets }, (_, i) => ({
-                        id: `temp-set-${i}`,
-                        exercise_id: templateExercise.exercise.id,
-                        set_type: templateExercise.default_set_types?.[i] || 'WORKING',
-                        weight: 0,
-                        reps: typeof templateExercise.default_reps === 'number' ? templateExercise.default_reps : (templateExercise.default_reps[i] as any)?.min || 0,
-                        is_completed: false,
-                      } as WorkoutSet)),
+                      sets: Array.from(
+                        { length: templateExercise.default_sets },
+                        (_, i) =>
+                          ({
+                            id: `temp-set-${i}`,
+                            exercise_id: templateExercise.exercise.id,
+                            set_type:
+                              templateExercise.default_set_types?.[i] ||
+                              "WORKING",
+                            weight: 0,
+                            reps:
+                              typeof templateExercise.default_reps === "number"
+                                ? templateExercise.default_reps
+                                : (templateExercise.default_reps[i] as any)
+                                    ?.min || 0,
+                            is_completed: false,
+                          }) as WorkoutSet,
+                      ),
                     }}
                     onDelete={() => {}}
                   />
@@ -176,7 +197,6 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
                     className="w-full h-14 text-lg font-semibold"
                     style={{ borderRadius: "var(--radius)" }}
                   >
-                    <Plus className="w-5 h-5 mr-2" />
                     Start Exercise
                   </Button>
                 </AlertDialogTrigger>
@@ -203,8 +223,7 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
                 className="w-full h-14 text-lg font-semibold"
                 style={{ borderRadius: "var(--radius)" }}
               >
-                <Plus className="w-5 h-5 mr-2" />
-                Start Exercise
+                Start 
               </Button>
             )}
           </div>
@@ -213,7 +232,7 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
 
       <BottomNav />
     </div>
-  )
+  );
 }
 
 export default function WorkoutOverview() {
@@ -228,11 +247,12 @@ export default function WorkoutOverview() {
   const [saveCompletedWorkout] = useSaveCompletedWorkoutMutation();
   const [reorderExercises] = useReorderExercisesMutation();
   const [removeExerciseFromWorkout] = useRemoveExerciseFromWorkoutMutation();
-  
+
   const { pendingTemplateId } = useAppSelector((state) => state.ui);
-  const { data: pendingTemplate, isLoading: isTemplateLoading } = useGetTemplateByIdQuery(pendingTemplateId!, {
-    skip: !pendingTemplateId,
-  });
+  const { data: pendingTemplate, isLoading: isTemplateLoading } =
+    useGetTemplateByIdQuery(pendingTemplateId!, {
+      skip: !pendingTemplateId,
+    });
 
   // DND
   const sensors = useSensors(
@@ -274,7 +294,9 @@ export default function WorkoutOverview() {
     });
   };
 
-  const { workoutDuration, isWorkoutTimerRunning } = useAppSelector((state) => state.ui);
+  const { workoutDuration, isWorkoutTimerRunning } = useAppSelector(
+    (state) => state.ui,
+  );
 
   // Duration timer
   useEffect(() => {
@@ -351,7 +373,9 @@ export default function WorkoutOverview() {
   if (pendingTemplateId && !pendingTemplate) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Template with id {pendingTemplateId} not found</p>
+        <p className="text-muted-foreground">
+          Template with id {pendingTemplateId} not found
+        </p>
       </div>
     );
   }
@@ -542,8 +566,7 @@ export default function WorkoutOverview() {
                 className="w-full h-14 text-lg font-semibold"
                 style={{ borderRadius: "var(--radius)" }}
               >
-                <Plus className="w-5 h-5 mr-2" />
-                Start Exercise
+                Start
               </Button>
             )}
           </div>
@@ -579,4 +602,3 @@ function BottomNav() {
     </nav>
   );
 }
-

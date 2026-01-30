@@ -1,34 +1,62 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, Filter, X, Plus, Play, Dumbbell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useGetExercisesQuery } from '@/store/api/exerciseApi';
-import { useAddExerciseToWorkoutMutation, useGetActiveWorkoutQuery } from '@/store/api/activeWorkoutApi';
-import { Exercise, PrimaryMuscleGroup, MovementPattern, PRIMARY_MUSCLE_GROUP_LABELS, MOVEMENT_PATTERN_LABELS, EQUIPMENT_LABELS, isIsometricExercise } from '@/types/workout';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { openExerciseCreator, toggleExerciseMuscleGroup, toggleExerciseMovementPattern, setExerciseSearchQuery, clearExerciseFilters } from '@/store/slices/uiSlice';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Filter, X, Plus, Play, Dumbbell } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useGetExercisesQuery } from "@/store/api/exerciseApi";
+import {
+  useAddExerciseToWorkoutMutation,
+  useGetActiveWorkoutQuery,
+} from "@/store/api/activeWorkoutApi";
+import {
+  Exercise,
+  PrimaryMuscleGroup,
+  MovementPattern,
+  PRIMARY_MUSCLE_GROUP_LABELS,
+  MOVEMENT_PATTERN_LABELS,
+  EQUIPMENT_LABELS,
+  isIsometricExercise,
+} from "@/types/workout";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  openExerciseCreator,
+  toggleExerciseMuscleGroup,
+  toggleExerciseMovementPattern,
+  setExerciseSearchQuery,
+  clearExerciseFilters,
+} from "@/store/slices/uiSlice";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Exercises() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
-  const { muscleGroups, movementPatterns, searchQuery } = useAppSelector(state => state.ui.exerciseFilters);
+  const { muscleGroups, movementPatterns, searchQuery } = useAppSelector(
+    (state) => state.ui.exerciseFilters,
+  );
   const [showFilters, setShowFilters] = useState(false);
-  
-  const [showPresetsOnly, setShowPresetsOnly] = useState<boolean | undefined>(undefined);
-  
+
+  const [showPresetsOnly, setShowPresetsOnly] = useState<boolean | undefined>(
+    undefined,
+  );
+
   const { data: exercises = [], isLoading } = useGetExercisesQuery({
     muscleGroups: muscleGroups.length > 0 ? muscleGroups : undefined,
-    movementPatterns: movementPatterns.length > 0 ? movementPatterns : undefined,
+    movementPatterns:
+      movementPatterns.length > 0 ? movementPatterns : undefined,
     search: searchQuery || undefined,
     showPresetsOnly: showPresetsOnly,
   });
-  
+
   const { data: activeWorkout } = useGetActiveWorkoutQuery();
   const [addExerciseToWorkout] = useAddExerciseToWorkoutMutation();
 
@@ -41,26 +69,28 @@ export default function Exercises() {
       });
       return;
     }
-    
+
     await addExerciseToWorkout({
       id: `temp-${Date.now()}`,
       exercise,
       order: activeWorkout.exercises.length,
-      sets: [{
-        id: `temp-set-${Date.now()}`,
-        exercise_id: exercise.id,
-        set_type: 'WORKING',
-        weight: 0,
-        reps: 0,
-        is_completed: false,
-      }],
+      sets: [
+        {
+          id: `temp-set-${Date.now()}`,
+          exercise_id: exercise.id,
+          set_type: "WORKING",
+          weight: 0,
+          reps: 0,
+          is_completed: false,
+        },
+      ],
     });
-    
+
     toast({
       title: "Exercise added",
       description: `${exercise.name} added to your workout`,
     });
-    navigate('/workout/active');
+    navigate("/workout/active");
   };
 
   const activeFiltersCount = muscleGroups.length + movementPatterns.length;
@@ -72,7 +102,9 @@ export default function Exercises() {
         <header className="pt-6 flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold mb-1">Exercise Library</h1>
-            <p className="text-muted-foreground">{exercises.length} exercises available</p>
+            <p className="text-muted-foreground">
+              {exercises.length} exercises available
+            </p>
           </div>
           <Link to="/exercises/new">
             <Button>
@@ -93,7 +125,7 @@ export default function Exercises() {
               className="pl-10"
             />
           </div>
-          
+
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="relative">
@@ -110,22 +142,30 @@ export default function Exercises() {
                 <SheetTitle className="flex items-center justify-between">
                   <span>Filters</span>
                   {activeFiltersCount > 0 && (
-                    <Button variant="ghost" size="sm" onClick={() => dispatch(clearExerciseFilters())}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => dispatch(clearExerciseFilters())}
+                    >
                       Clear all
                     </Button>
                   )}
                 </SheetTitle>
               </SheetHeader>
-              
+
               <div className="mt-6 space-y-6">
                 {/* Preset/Custom Filter */}
                 <div>
-                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Type</h3>
+                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                    Type
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setShowPresetsOnly(undefined)}
                       className={cn(
-                        showPresetsOnly === undefined ? 'tag-pill-active' : 'tag-pill-inactive'
+                        showPresetsOnly === undefined
+                          ? "tag-pill-active"
+                          : "tag-pill-inactive",
                       )}
                     >
                       All
@@ -133,7 +173,9 @@ export default function Exercises() {
                     <button
                       onClick={() => setShowPresetsOnly(true)}
                       className={cn(
-                        showPresetsOnly === true ? 'tag-pill-active' : 'tag-pill-inactive'
+                        showPresetsOnly === true
+                          ? "tag-pill-active"
+                          : "tag-pill-inactive",
                       )}
                     >
                       Preset
@@ -141,7 +183,9 @@ export default function Exercises() {
                     <button
                       onClick={() => setShowPresetsOnly(false)}
                       className={cn(
-                        showPresetsOnly === false ? 'tag-pill-active' : 'tag-pill-inactive'
+                        showPresetsOnly === false
+                          ? "tag-pill-active"
+                          : "tag-pill-inactive",
                       )}
                     >
                       Custom
@@ -150,14 +194,24 @@ export default function Exercises() {
                 </div>
                 {/* Muscle Groups */}
                 <div>
-                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Muscle Groups</h3>
+                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                    Muscle Groups
+                  </h3>
                   <div className="flex flex-wrap gap-2">
-                    {(Object.keys(PRIMARY_MUSCLE_GROUP_LABELS) as PrimaryMuscleGroup[]).map((muscle) => (
+                    {(
+                      Object.keys(
+                        PRIMARY_MUSCLE_GROUP_LABELS,
+                      ) as PrimaryMuscleGroup[]
+                    ).map((muscle) => (
                       <button
                         key={muscle}
-                        onClick={() => dispatch(toggleExerciseMuscleGroup(muscle))}
+                        onClick={() =>
+                          dispatch(toggleExerciseMuscleGroup(muscle))
+                        }
                         className={cn(
-                          muscleGroups.includes(muscle) ? 'tag-pill-active' : 'tag-pill-inactive'
+                          muscleGroups.includes(muscle)
+                            ? "tag-pill-active"
+                            : "tag-pill-inactive",
                         )}
                       >
                         {PRIMARY_MUSCLE_GROUP_LABELS[muscle]}
@@ -168,14 +222,22 @@ export default function Exercises() {
 
                 {/* Movement Patterns */}
                 <div>
-                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">Movement Patterns</h3>
+                  <h3 className="font-semibold mb-3 uppercase text-sm tracking-wide">
+                    Movement Patterns
+                  </h3>
                   <div className="flex flex-wrap gap-2">
-                    {(Object.keys(MOVEMENT_PATTERN_LABELS) as MovementPattern[]).map((pattern) => (
+                    {(
+                      Object.keys(MOVEMENT_PATTERN_LABELS) as MovementPattern[]
+                    ).map((pattern) => (
                       <button
                         key={pattern}
-                        onClick={() => dispatch(toggleExerciseMovementPattern(pattern))}
+                        onClick={() =>
+                          dispatch(toggleExerciseMovementPattern(pattern))
+                        }
                         className={cn(
-                          movementPatterns.includes(pattern) ? 'tag-pill-active' : 'tag-pill-inactive'
+                          movementPatterns.includes(pattern)
+                            ? "tag-pill-active"
+                            : "tag-pill-inactive",
                         )}
                       >
                         {MOVEMENT_PATTERN_LABELS[pattern]}
@@ -184,8 +246,8 @@ export default function Exercises() {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => setShowFilters(false)}
                 >
                   Apply Filters
@@ -199,8 +261,8 @@ export default function Exercises() {
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap gap-2">
             {muscleGroups.map((muscle) => (
-              <Badge 
-                key={muscle} 
+              <Badge
+                key={muscle}
                 variant="secondary"
                 className="cursor-pointer"
                 onClick={() => dispatch(toggleExerciseMuscleGroup(muscle))}
@@ -210,8 +272,8 @@ export default function Exercises() {
               </Badge>
             ))}
             {movementPatterns.map((pattern) => (
-              <Badge 
-                key={pattern} 
+              <Badge
+                key={pattern}
                 variant="secondary"
                 className="cursor-pointer"
                 onClick={() => dispatch(toggleExerciseMovementPattern(pattern))}
@@ -232,12 +294,14 @@ export default function Exercises() {
           ) : exercises.length === 0 ? (
             <div className="stat-card text-center py-12">
               <p className="text-muted-foreground">No exercises found</p>
-              <p className="text-sm text-muted-foreground mt-1">Try adjusting your filters</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try adjusting your filters
+              </p>
             </div>
           ) : (
             exercises.map((exercise) => (
-              <ExerciseListItem 
-                key={exercise.id} 
+              <ExerciseListItem
+                key={exercise.id}
                 exercise={exercise}
                 onAdd={() => handleAddToWorkout(exercise)}
                 showAddButton={!!activeWorkout}
@@ -259,13 +323,17 @@ interface ExerciseListItemProps {
   showAddButton: boolean;
 }
 
-function ExerciseListItem({ exercise, onAdd, showAddButton }: ExerciseListItemProps) {
+function ExerciseListItem({
+  exercise,
+  onAdd,
+  showAddButton,
+}: ExerciseListItemProps) {
   return (
     <div className="stat-card hover:bg-accent/30 transition-colors">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold truncate">{exercise.name}</h3>
-          
+
           <div className="flex flex-wrap gap-1.5 mt-2">
             <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full">
               {PRIMARY_MUSCLE_GROUP_LABELS[exercise.primary_muscle_group]}
@@ -276,7 +344,7 @@ function ExerciseListItem({ exercise, onAdd, showAddButton }: ExerciseListItemPr
               </span>
             )}
             <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
-              {exercise.equipment.map(e => EQUIPMENT_LABELS[e]).join(', ')}
+              {exercise.equipment.map((e) => EQUIPMENT_LABELS[e]).join(", ")}
             </span>
           </div>
         </div>
