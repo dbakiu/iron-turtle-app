@@ -57,7 +57,6 @@ export default function ExercisePage() {
     setEditingSetId(null);
   }, [workoutExerciseId]);
 
-
   // Rest timer
   useEffect(() => {
     if (!restTimer.isRunning) return;
@@ -109,21 +108,23 @@ export default function ExercisePage() {
 
   return (
     <div className="min-h-screen bg-background pb-44">
-      <header className="p-4 flex items-center justify-between border-b border-border">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link to="/workout/active">
-                <Button variant="ghost" size="icon">
-                  <LayoutList className="w-6 h-6" />
-                </Button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Back to Workout Overview</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <header className="p-4 flex items-center justify-start border-b border-border truncate">
+        <div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/workout/active">
+                  <Button variant="ghost" size="icon">
+                    <LayoutList className="w-6 h-6" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Back to Workout Overview</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <div className="flex-grow text-center">
           <h1 className="text-xl font-bold truncate px-4">
             {workoutExercise.exercise.name}
@@ -136,15 +137,16 @@ export default function ExercisePage() {
             </p>
           )}
         </div>
-        <div className="w-10"></div> {/* Spacer to balance header */}
       </header>
 
       <div className="p-4 max-w-lg mx-auto space-y-4">
         {/* Sets List */}
         <div className="space-y-3">
           {workoutExercise.sets.map((set, index) => {
-            const isOpen = (editingSetId === null && index === currentSetIndex) || editingSetId === set.id;
-            
+            const isOpen =
+              (editingSetId === null && index === currentSetIndex) ||
+              editingSetId === set.id;
+
             return (
               <ActiveSetCard
                 key={set.id}
@@ -155,7 +157,7 @@ export default function ExercisePage() {
                 isFuture={currentSetIndex !== -1 && index > currentSetIndex}
                 setEditing={setEditingSetId}
               />
-            )
+            );
           })}
           <Button
             variant="outline"
@@ -168,7 +170,9 @@ export default function ExercisePage() {
 
           {workoutExercise.sets.every((set) => set.is_completed) &&
             (() => {
-              const currentIndex = activeWorkout.exercises.findIndex((ex) => ex.id === workoutExerciseId);
+              const currentIndex = activeWorkout.exercises.findIndex(
+                (ex) => ex.id === workoutExerciseId,
+              );
               if (currentIndex < activeWorkout.exercises.length - 1) {
                 return (
                   <Button
@@ -176,7 +180,8 @@ export default function ExercisePage() {
                     size="lg"
                     className="w-full h-12 text-lg mt-2 overflow-hidden whitespace-nowrap text-ellipsis"
                     onClick={() => {
-                      const nextExercise = activeWorkout.exercises[currentIndex + 1];
+                      const nextExercise =
+                        activeWorkout.exercises[currentIndex + 1];
                       if (nextExercise) {
                         navigate(`/workout/active/exercise/${nextExercise.id}`);
                       }
@@ -191,7 +196,7 @@ export default function ExercisePage() {
                     variant="secondary"
                     size="lg"
                     className="w-full h-12 text-lg mt-2 overflow-hidden whitespace-nowrap text-ellipsis"
-                    onClick={() => navigate('/workout/active')}
+                    onClick={() => navigate("/workout/active")}
                   >
                     Back to Overview
                   </Button>
@@ -201,104 +206,107 @@ export default function ExercisePage() {
         </div>
 
         {/* Exercise Details / Reference Section */}
-                <Card className="shadow-none p-4">
-                  <div className="flex gap-2 justify-between">
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() =>
-                        setActiveReferenceTab(
-                          activeReferenceTab === "notes" ? "none" : "notes",
-                        )
-                      }
-                    >
-                      Notes
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() =>
-                        setActiveReferenceTab(
-                          activeReferenceTab === "history" ? "none" : "history",
-                        )
-                      }
-                    >
-                      History
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() =>
-                        setActiveReferenceTab(
-                          activeReferenceTab === "alternatives" ? "none" : "alternatives",
-                        )
-                      }
-                    >
-                      Alternatives
-                    </Button>
-                  </div>
-        
-                  {activeReferenceTab !== "none" && (
-                                <div className="mt-4 p-3 border rounded-lg bg-muted/20">
-                                  {activeReferenceTab === "notes" && (
-                                    <p className="text-sm text-muted-foreground text-wrap">
-                                      {workoutExercise.exercise.notes ||
-                                        "No notes available for this exercise."}
-                                    </p>
-                                  )}
-                                  {activeReferenceTab === "history" && (
-                                    <p className="text-sm text-muted-foreground text-wrap">
-                                      Workout history coming soon!
-                                    </p>
-                                  )}
-                                  {activeReferenceTab === "alternatives" && (
-                                    <p className="text-sm text-muted-foreground text-wrap">
-                                      Alternative exercises coming soon!
-                                    </p>
-                                  )}
-                                </div>                  )}
-                </Card>
-              </div>
-        
-              {/* Rest Timer */}
-              {restTimer.isRunning && (
-                <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
-                  <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm text-muted-foreground uppercase tracking-wide">
-                          Rest
-                        </span>
-                        <span
-                          className={cn(
-                            "text-3xl font-bold tabular-nums",
-                            restTimer.seconds <= 10 && "text-destructive",
-                          )}
-                        >
-                          {Math.floor(restTimer.seconds / 60)}:
-                          {(restTimer.seconds % 60).toString().padStart(2, "0")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => dispatch(addRestTime(15))}
-                        >
-                          +15s
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => dispatch(stopRestTimer())}
-                        >
-                          Stop
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <Card className="shadow-none p-4">
+          <div className="flex gap-2 justify-between">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "notes" ? "none" : "notes",
+                )
+              }
+            >
+              Notes
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "history" ? "none" : "history",
+                )
+              }
+            >
+              History
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() =>
+                setActiveReferenceTab(
+                  activeReferenceTab === "alternatives"
+                    ? "none"
+                    : "alternatives",
+                )
+              }
+            >
+              Alternatives
+            </Button>
+          </div>
+
+          {activeReferenceTab !== "none" && (
+            <div className="mt-4 p-3 border rounded-lg bg-muted/20">
+              {activeReferenceTab === "notes" && (
+                <p className="text-sm text-muted-foreground text-wrap">
+                  {workoutExercise.exercise.notes ||
+                    "No notes available for this exercise."}
+                </p>
+              )}
+              {activeReferenceTab === "history" && (
+                <p className="text-sm text-muted-foreground text-wrap">
+                  Workout history coming soon!
+                </p>
+              )}
+              {activeReferenceTab === "alternatives" && (
+                <p className="text-sm text-muted-foreground text-wrap">
+                  Alternative exercises coming soon!
+                </p>
               )}
             </div>
-          );
-        }
+          )}
+        </Card>
+      </div>
+
+      {/* Rest Timer */}
+      {restTimer.isRunning && (
+        <div className="fixed bottom-20 left-0 right-0 z-50 px-4">
+          <div className="glass-panel rounded-xl p-4 max-w-lg mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                  Rest
+                </span>
+                <span
+                  className={cn(
+                    "text-3xl font-bold tabular-nums",
+                    restTimer.seconds <= 10 && "text-destructive",
+                  )}
+                >
+                  {Math.floor(restTimer.seconds / 60)}:
+                  {(restTimer.seconds % 60).toString().padStart(2, "0")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => dispatch(addRestTime(15))}
+                >
+                  +15s
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => dispatch(stopRestTimer())}
+                >
+                  Stop
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
