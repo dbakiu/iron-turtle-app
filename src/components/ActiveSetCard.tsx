@@ -10,12 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,7 +66,9 @@ export function ActiveSetCard({
         updates = { weight: parseFloat(weight) || 0 };
         break;
       case "reps":
-        updates = { [isDuration ? "duration" : "reps"]: parseInt(reps, 10) || 0 };
+        updates = {
+          [isDuration ? "duration" : "reps"]: parseInt(reps, 10) || 0,
+        };
         break;
       case "setType":
         updates = { set_type: setType };
@@ -95,7 +92,11 @@ export function ActiveSetCard({
       newValue = (parseInt(reps, 10) || 0) + amount;
       setReps(newValue.toString());
       const isDuration = set.duration !== undefined;
-      updateSet({ exerciseId, setId: set.id, updates: { [isDuration ? "duration" : "reps"]: newValue } });
+      updateSet({
+        exerciseId,
+        setId: set.id,
+        updates: { [isDuration ? "duration" : "reps"]: newValue },
+      });
     }
   };
 
@@ -106,7 +107,8 @@ export function ActiveSetCard({
       setId: set.id,
       updates: {
         weight: parseFloat(weight) || 0,
-        [set.duration !== undefined ? "duration" : "reps"]: parseInt(reps, 10) || 0,
+        [set.duration !== undefined ? "duration" : "reps"]:
+          parseInt(reps, 10) || 0,
         set_type: setType,
         is_completed: true, // Ensure it's marked as completed
       },
@@ -130,8 +132,12 @@ export function ActiveSetCard({
     return (
       <Card className="p-4 bg-muted/50 border-dashed">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-muted-foreground">Set {setIndex + 1}</span>
-          <span className="text-sm text-muted-foreground">{set.weight} kg x {set.reps} reps</span>
+          <span className="text-sm font-medium text-muted-foreground">
+            Set {setIndex + 1}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            {set.weight} kg x {set.reps} reps
+          </span>
         </div>
       </Card>
     );
@@ -155,7 +161,10 @@ export function ActiveSetCard({
               {set.set_type.charAt(0)}
             </span>
             <p className="font-semibold">
-              Set {setIndex + 1}: <span className="font-normal">{set.weight} kg x {set.reps} reps</span>
+              Set {setIndex + 1}:{" "}
+              <span className="font-normal">
+                {set.weight} kg x {set.reps} reps
+              </span>
             </p>
           </div>
           <DropdownMenu>
@@ -165,8 +174,15 @@ export function ActiveSetCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleMakeEditable}>Edit</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleRemove} className="text-destructive">Delete</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleMakeEditable}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleRemove}
+                className="text-destructive"
+              >
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -176,15 +192,15 @@ export function ActiveSetCard({
 
   // Open (isOpen) set
   return (
-    <Card className={cn(isOpen && !set.is_completed && "border-primary ring-2 ring-primary")}>
+    <Card className={cn(isOpen && !set.is_completed && "border-primary")}>
       <CardHeader className="p-4 flex flex-row items-center justify-between">
-        <CardTitle className="text-xl text-muted-foreground">
+        <CardTitle className="text-md text-muted-foreground">
           Set {setIndex + 1}
         </CardTitle>
         <Select value={setType} onValueChange={handleTypeChange}>
           <SelectTrigger
             className={cn(
-              "w-auto h-10 px-3 border-2 rounded-lg font-bold text-base",
+              "w-auto h-10 px-3 border-2 rounded-sm font-bold",
               "focus:ring-0 focus:ring-offset-0", // override default focus
               setType === "WARMUP" &&
                 "border-warmup/50 text-warmup hover:bg-warmup/10",
@@ -212,7 +228,9 @@ export function ActiveSetCard({
       <CardContent className="p-4 pt-0 space-y-4">
         <div className="grid grid-cols-[1fr_1fr] items-start gap-3">
           <div className="flex flex-col items-center">
-            <label className="text-xs uppercase text-muted-foreground mb-1">Weight (kg)</label>
+            <label className="text-xs uppercase text-muted-foreground mb-1">
+              Weight (kg)
+            </label>
             <Input
               type="number"
               value={weight}
@@ -225,9 +243,27 @@ export function ActiveSetCard({
               min={0}
             />
             <div className="flex gap-2 mt-2">
-              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 2.5)}>+2.5</Button>
-              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 5)}>+5</Button>
-              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("weight", 10)}>+10</Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleQuickAdd("weight", 2.5)}
+              >
+                +2.5
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleQuickAdd("weight", 5)}
+              >
+                +5
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleQuickAdd("weight", 10)}
+              >
+                +10
+              </Button>
             </div>
           </div>
 
@@ -241,22 +277,36 @@ export function ActiveSetCard({
               onChange={(e) => setReps(e.target.value)}
               onFocus={(e) => e.target.select()}
               className="numeric-input h-12 w-full text-center text-xl rounded-lg"
-              aria-label={set.duration !== undefined ? "Duration (seconds)" : "Reps"}
+              aria-label={
+                set.duration !== undefined ? "Duration (seconds)" : "Reps"
+              }
               inputMode="numeric"
               onBlur={() => handleUpdate("reps")}
               min={0}
             />
             <div className="flex gap-2 mt-2">
-              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("reps", 1)}>+1</Button>
-              <Button size="sm" variant="outline" onClick={() => handleQuickAdd("reps", 5)}>+5</Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleQuickAdd("reps", 1)}
+              >
+                +1
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleQuickAdd("reps", 5)}
+              >
+                +5
+              </Button>
             </div>
           </div>
         </div>
 
         <Button
-          size="lg"
+          size="sm"
           onClick={handleComplete}
-          className="w-full h-12 text-lg"
+          className="w-full h-12 text-md"
         >
           <Check className="w-5 h-5 mr-2" />
           {set.is_completed ? "Save Changes" : "Complete Set"}

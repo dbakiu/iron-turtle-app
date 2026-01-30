@@ -120,13 +120,13 @@ export default function ExercisePage() {
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Back to Workout Overview</p>
+                <p>Workout Overview</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex-grow text-center">
-          <h1 className="text-xl font-bold truncate px-4">
+        <div className="flex-grow text-center truncate">
+          <h1 className="text-l font-bold px-4 ">
             {workoutExercise.exercise.name}
           </h1>
           {workoutExercise.exercise.primary_muscle_group && (
