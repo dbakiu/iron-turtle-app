@@ -80,10 +80,8 @@ export function ActiveSetCard({
     }
 
     updateSet({ exerciseId, setId: set.id, updates });
-    // Do NOT call onClose here
   };
 
-  // Quick increment buttons
   const handleQuickAdd = (field: "weight" | "reps", amount: number) => {
     let newValue: number;
     if (field === "weight") {
@@ -100,10 +98,8 @@ export function ActiveSetCard({
         updates: { [isDuration ? "duration" : "reps"]: newValue },
       });
     }
-    // Do NOT call onClose here
   };
 
-  // Mark set as complete
   const handleComplete = async () => {
     const wasCompleted = set.is_completed;
     await updateSet({
@@ -120,7 +116,7 @@ export function ActiveSetCard({
     if (!wasCompleted) {
       await completeSet({ exerciseId, setId: set.id });
     }
-    onClose(); // clear editing state after complete
+    onClose();
   };
 
   const handleRemove = () => {
@@ -141,7 +137,6 @@ export function ActiveSetCard({
     }
   };
 
-  // Render future set (cannot edit)
   if (isFuture) {
     return (
       <Card className="p-4 bg-muted/50 border-dashed">

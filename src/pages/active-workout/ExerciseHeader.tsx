@@ -14,29 +14,37 @@ interface Props {
 }
 
 export function ExerciseHeader({ exercise }: Props) {
+  const subtext = exercise.primary_muscle_group
+    ?.replace(/_/g, " ")
+    .toLowerCase();
+
   return (
-    <header className="p-4 flex items-center border-b border-border truncate">
-      <TooltipProvider>
+    <header className="grid grid-cols-[48px_1fr_48px] items-center p-4 border-b border-border bg-background">
+      <div className="flex justify-start">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link to="/workout/active">
-              <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/workout/active" aria-label="Workout Overview">
                 <LayoutList className="w-6 h-6" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </TooltipTrigger>
-          <TooltipContent>Workout Overview</TooltipContent>
+          <TooltipContent side="bottom">Workout Overview</TooltipContent>
         </Tooltip>
-      </TooltipProvider>
+      </div>
 
-      <div className="flex-grow text-center truncate">
-        <h1 className="text-lg font-bold px-4">{exercise.name}</h1>
-        {exercise.primary_muscle_group && (
-          <p className="text-sm text-muted-foreground capitalize">
-            {exercise.primary_muscle_group.replace(/_/g, " ").toLowerCase()}
+      <div className="text-center min-w-0">
+        <h1 className="text-lg font-bold truncate px-2" title={exercise.name}>
+          {exercise.name}
+        </h1>
+        {subtext && (
+          <p className="text-sm text-muted-foreground capitalize truncate">
+            {subtext}
           </p>
         )}
       </div>
+
+      <div className="w-12" aria-hidden="true" />
     </header>
   );
 }
