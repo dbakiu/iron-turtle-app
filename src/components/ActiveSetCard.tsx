@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, MoreVertical, Croissant } from "lucide-react";
+import { Check, MoreVertical, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -307,7 +307,7 @@ export function ActiveSetCard({
               onClick={handleCancel}
               className="w-full h-12 text-sm bg-destructive"
             >
-              <Croissant className="w-5 h-5 mr-2" />
+              <X className="w-5 h-5 " />
               Cancel
             </Button>
           </div>
@@ -317,7 +317,7 @@ export function ActiveSetCard({
               onClick={handleComplete}
               className="w-full h-12 text-md"
             >
-              <Check className="w-5 h-5 mr-2" />
+              <Check className="w-5 h-5" />
               {set.is_completed ? "Save Changes" : "Complete Set"}
             </Button>
           </div>
