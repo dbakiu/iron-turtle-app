@@ -49,6 +49,7 @@ export type Equipment =
   | "BODYWEIGHT"
   | "KETTLEBELL"
   | "BANDS"
+  | "RACK"
   | "OTHER";
 
 // Set types
@@ -229,6 +230,7 @@ export const EQUIPMENT_LABELS: Record<Equipment, string> = {
   BODYWEIGHT: "Bodyweight",
   KETTLEBELL: "Kettlebell",
   BANDS: "Bands",
+  RACK: "RACK",
   OTHER: "Other",
 };
 
