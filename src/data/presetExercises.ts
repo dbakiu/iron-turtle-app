@@ -119,7 +119,7 @@ export const presetExercises: Exercise[] = [
   },
   {
     id: "preset-back-extension",
-    name: "Back Extensio",
+    name: "Back Extension",
     primary_muscle_group: "BACK",
     equipment: ["OTHER"],
     notes:
