@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, MoreVertical } from "lucide-react";
+import { Check, MoreVertical, Croissant } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -125,11 +125,20 @@ export function ActiveSetCard({
 
   const handleRemove = () => {
     removeSet({ exerciseId, setId: set.id });
-    onClose(); // also clear editing if removed
+    onClose();
   };
 
   const handleMakeEditable = () => {
     onEdit(set.id);
+  };
+
+  const handleCancel = () => {
+    if (set.is_completed) {
+      onEdit(null);
+      onClose();
+    } else {
+      handleRemove();
+    }
   };
 
   // Render future set (cannot edit)
@@ -291,15 +300,28 @@ export function ActiveSetCard({
             </div>
           </div>
         </div>
-
-        <Button
-          size="sm"
-          onClick={handleComplete}
-          className="w-full h-12 text-md"
-        >
-          <Check className="w-5 h-5 mr-2" />
-          {set.is_completed ? "Save Changes" : "Complete Set"}
-        </Button>
+        <div className="flex justify-start items-center gap-2">
+          <div className="flex mt-2">
+            <Button
+              size="sm"
+              onClick={handleCancel}
+              className="w-full h-12 text-sm bg-destructive"
+            >
+              <Croissant className="w-5 h-5 mr-2" />
+              Cancel
+            </Button>
+          </div>
+          <div className="flex mt-2 w-full">
+            <Button
+              size="sm"
+              onClick={handleComplete}
+              className="w-full h-12 text-md"
+            >
+              <Check className="w-5 h-5 mr-2" />
+              {set.is_completed ? "Save Changes" : "Complete Set"}
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

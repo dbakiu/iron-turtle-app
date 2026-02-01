@@ -1,10 +1,5 @@
 import { useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { LayoutList, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ActiveSetCard } from "@/components/ActiveSetCard";
-import { cn } from "@/lib/utils";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   useGetActiveWorkoutQuery,
   useAddSetMutation,
