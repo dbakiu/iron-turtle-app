@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, Trash2, Pencil, MoreVertical } from "lucide-react";
+import { Check, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { WorkoutSet, SetType } from "@/types/workout";
+import { ActiveSet, WorkoutSet, SetType } from "@/types/workout";
 import {
   useUpdateSetMutation,
   useCompleteSetMutation,
@@ -25,12 +25,13 @@ import {
 } from "@/store/api/activeWorkoutApi";
 
 interface ActiveSetCardProps {
-  set: WorkoutSet;
+  set: ActiveSet;
   exerciseId: string;
   setIndex: number;
   isOpen: boolean;
   isFuture: boolean;
-  setEditing: (setId: string | null) => void;
+  onEdit: (setId: string | null) => void; // set as editing
+  onClose: () => void; // clear editing state
 }
 
 const setTypes: SetType[] = ["WARMUP", "WORKING", "MYOREP", "FAILURE", "AMRAP"];
@@ -41,22 +42,25 @@ export function ActiveSetCard({
   setIndex,
   isOpen,
   isFuture,
-  setEditing,
+  onEdit,
+  onClose,
 }: ActiveSetCardProps) {
   const [weight, setWeight] = useState(set.weight.toString());
-  const [reps, setReps] = useState((set.reps || set.duration || 0).toString());
-  const [setType, setSetType] = useState(set.set_type);
+  const [reps, setReps] = useState((set.reps ?? set.duration ?? 0).toString());
+  const [setType, setSetType] = useState<SetType>(set.set_type);
 
   const [updateSet] = useUpdateSetMutation();
   const [completeSet] = useCompleteSetMutation();
   const [removeSet] = useRemoveSetMutation();
 
+  // Keep local state in sync when `set` prop changes
   useEffect(() => {
     setWeight(set.weight.toString());
-    setReps((set.reps || set.duration || 0).toString());
+    setReps((set.reps ?? set.duration ?? 0).toString());
     setSetType(set.set_type);
   }, [set]);
 
+  // Update a field without closing editing
   const handleUpdate = (field: "weight" | "reps" | "setType") => {
     const isDuration = set.duration !== undefined;
     let updates: Partial<WorkoutSet> = {};
@@ -74,14 +78,12 @@ export function ActiveSetCard({
         updates = { set_type: setType };
         break;
     }
+
     updateSet({ exerciseId, setId: set.id, updates });
+    // Do NOT call onClose here
   };
 
-  const handleTypeChange = (value: SetType) => {
-    setSetType(value);
-    updateSet({ exerciseId, setId: set.id, updates: { set_type: value } });
-  };
-
+  // Quick increment buttons
   const handleQuickAdd = (field: "weight" | "reps", amount: number) => {
     let newValue: number;
     if (field === "weight") {
@@ -98,8 +100,10 @@ export function ActiveSetCard({
         updates: { [isDuration ? "duration" : "reps"]: newValue },
       });
     }
+    // Do NOT call onClose here
   };
 
+  // Mark set as complete
   const handleComplete = async () => {
     const wasCompleted = set.is_completed;
     await updateSet({
@@ -110,24 +114,25 @@ export function ActiveSetCard({
         [set.duration !== undefined ? "duration" : "reps"]:
           parseInt(reps, 10) || 0,
         set_type: setType,
-        is_completed: true, // Ensure it's marked as completed
+        is_completed: true,
       },
     });
-    // Only call completeSet if it wasn't already completed, to avoid creating multiple history entries if logic changes
     if (!wasCompleted) {
       await completeSet({ exerciseId, setId: set.id });
     }
-    setEditing(null); // Exit editing mode on completion
+    onClose(); // clear editing state after complete
   };
 
   const handleRemove = () => {
     removeSet({ exerciseId, setId: set.id });
+    onClose(); // also clear editing if removed
   };
 
   const handleMakeEditable = () => {
-    setEditing(set.id);
+    onEdit(set.id);
   };
 
+  // Render future set (cannot edit)
   if (isFuture) {
     return (
       <Card className="p-4 bg-muted/50 border-dashed">
@@ -136,13 +141,15 @@ export function ActiveSetCard({
             Set {setIndex + 1}
           </span>
           <span className="text-sm text-muted-foreground">
-            {set.weight} kg x {set.reps} reps
+            {set.weight} kg x {set.reps ?? set.duration}{" "}
+            {set.duration ? "sec" : "reps"}
           </span>
         </div>
       </Card>
     );
   }
 
+  // Render collapsed set
   if (!isOpen) {
     return (
       <Card className={cn(set.is_completed && "bg-primary/10")}>
@@ -152,18 +159,20 @@ export function ActiveSetCard({
               className={cn(
                 "flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm",
                 "set-badge",
-                set.set_type === "WARMUP" && "set-badge-warmup",
-                set.set_type === "WORKING" && "set-badge-working",
-                set.set_type === "MYOREP" && "set-badge-myorep",
-                set.set_type === "FAILURE" && "set-badge-failure",
+                setType === "WARMUP" && "set-badge-warmup",
+                setType === "WORKING" && "set-badge-working",
+                setType === "MYOREP" && "set-badge-myorep",
+                setType === "FAILURE" && "set-badge-failure",
+                setType === "AMRAP" && "set-badge-amrap",
               )}
             >
-              {set.set_type.charAt(0)}
+              {setType.charAt(0)}
             </span>
             <p className="font-semibold">
               Set {setIndex + 1}:{" "}
               <span className="font-normal">
-                {set.weight} kg x {set.reps} reps
+                {set.weight} kg x {set.reps ?? set.duration}{" "}
+                {set.duration ? "sec" : "reps"}
               </span>
             </p>
           </div>
@@ -190,18 +199,17 @@ export function ActiveSetCard({
     );
   }
 
-  // Open (isOpen) set
+  // Render open/editable set
   return (
     <Card className={cn(isOpen && !set.is_completed && "border-primary")}>
       <CardHeader className="p-4 flex flex-row items-center justify-between">
         <CardTitle className="text-md text-muted-foreground">
           Set {setIndex + 1}
         </CardTitle>
-        <Select value={setType} onValueChange={handleTypeChange}>
+        <Select value={setType} onValueChange={(v) => setSetType(v)}>
           <SelectTrigger
             className={cn(
               "w-auto h-10 px-3 border-2 rounded-sm font-bold",
-              "focus:ring-0 focus:ring-offset-0", // override default focus
               setType === "WARMUP" &&
                 "border-warmup/50 text-warmup hover:bg-warmup/10",
               setType === "WORKING" &&
@@ -237,33 +245,21 @@ export function ActiveSetCard({
               onChange={(e) => setWeight(e.target.value)}
               onFocus={(e) => e.target.select()}
               className="numeric-input h-12 w-full text-center text-xl rounded-lg"
-              aria-label="Weight"
               inputMode="decimal"
               onBlur={() => handleUpdate("weight")}
               min={0}
             />
             <div className="flex gap-2 mt-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleQuickAdd("weight", 2.5)}
-              >
-                +2.5
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleQuickAdd("weight", 5)}
-              >
-                +5
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleQuickAdd("weight", 10)}
-              >
-                +10
-              </Button>
+              {[2.5, 5, 10].map((amt) => (
+                <Button
+                  key={amt}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAdd("weight", amt)}
+                >
+                  +{amt}
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -277,28 +273,21 @@ export function ActiveSetCard({
               onChange={(e) => setReps(e.target.value)}
               onFocus={(e) => e.target.select()}
               className="numeric-input h-12 w-full text-center text-xl rounded-lg"
-              aria-label={
-                set.duration !== undefined ? "Duration (seconds)" : "Reps"
-              }
               inputMode="numeric"
               onBlur={() => handleUpdate("reps")}
               min={0}
             />
             <div className="flex gap-2 mt-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleQuickAdd("reps", 1)}
-              >
-                +1
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleQuickAdd("reps", 5)}
-              >
-                +5
-              </Button>
+              {[1, 5].map((amt) => (
+                <Button
+                  key={amt}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleQuickAdd("reps", amt)}
+                >
+                  +{amt}
+                </Button>
+              ))}
             </div>
           </div>
         </div>

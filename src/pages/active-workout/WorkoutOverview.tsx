@@ -223,7 +223,7 @@ function PendingWorkoutView({ template }: { template: WorkoutTemplate }) {
                 className="w-full h-14 text-lg font-semibold"
                 style={{ borderRadius: "var(--radius)" }}
               >
-                Start 
+                Start
               </Button>
             )}
           </div>

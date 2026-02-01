@@ -1,55 +1,69 @@
 // Iron Turtle - Type Definitions (Revised Spec)
 
 // High-level muscle grouping for UI display
-export type PrimaryMuscleGroup = 'LEGS' | 'CHEST' | 'BACK' | 'ARMS' | 'CORE' | 'SHOULDERS';
+export type PrimaryMuscleGroup =
+  | "LEGS"
+  | "CHEST"
+  | "BACK"
+  | "ARMS"
+  | "CORE"
+  | "SHOULDERS";
 
 // Detailed muscle for deeper filtering (optional)
 export type PrimaryMuscle =
-  | 'QUADS'
-  | 'HAMSTRINGS'
-  | 'GLUTES'
-  | 'CALVES'
-  | 'PECS'
-  | 'LATS'
-  | 'TRAPS'
-  | 'RHOMBOIDS'
-  | 'BICEPS'
-  | 'TRICEPS'
-  | 'FOREARMS'
-  | 'ANTERIOR_DELTS'
-  | 'LATERAL_DELTS'
-  | 'REAR_DELTS'
-  | 'ABS'
-  | 'OBLIQUES'
-  | 'LOWER_BACK';
+  | "QUADS"
+  | "HAMSTRINGS"
+  | "GLUTES"
+  | "CALVES"
+  | "PECS"
+  | "LATS"
+  | "TRAPS"
+  | "RHOMBOIDS"
+  | "BICEPS"
+  | "TRICEPS"
+  | "FOREARMS"
+  | "ANTERIOR_DELTS"
+  | "LATERAL_DELTS"
+  | "REAR_DELTS"
+  | "ABS"
+  | "OBLIQUES"
+  | "LOWER_BACK";
 
 // Movement patterns for swap/replacement logic
 export type MovementPattern =
-  | 'SQUAT'
-  | 'HINGE'
-  | 'HORIZONTAL_PUSH'
-  | 'HORIZONTAL_PULL'
-  | 'VERTICAL_PUSH'
-  | 'VERTICAL_PULL'
-  | 'ISOLATION'
-  | 'CORE';
+  | "SQUAT"
+  | "HINGE"
+  | "HORIZONTAL_PUSH"
+  | "HORIZONTAL_PULL"
+  | "VERTICAL_PUSH"
+  | "VERTICAL_PULL"
+  | "ISOLATION"
+  | "CORE";
 
 // Equipment types - multi-select allowed per exercise
 export type Equipment =
-  | 'BARBELL'
-  | 'DUMBBELL'
-  | 'CABLE'
-  | 'MACHINE'
-  | 'BODYWEIGHT'
-  | 'KETTLEBELL'
-  | 'BANDS'
-  | 'OTHER';
+  | "BARBELL"
+  | "DUMBBELL"
+  | "CABLE"
+  | "MACHINE"
+  | "BODYWEIGHT"
+  | "KETTLEBELL"
+  | "BANDS"
+  | "OTHER";
 
 // Set types
-export type SetType = 'WARMUP' | 'WORKING' | 'MYOREP' | 'FAILURE' | 'AMRAP';
+export type SetType = "WARMUP" | "WORKING" | "MYOREP" | "FAILURE" | "AMRAP";
 
 // Template tags for categorization
-export type TemplateTag = 'PUSH' | 'PULL' | 'LEGS' | 'UPPER' | 'LOWER' | 'FULL_BODY' | 'ARMS' | 'CORE';
+export type TemplateTag =
+  | "PUSH"
+  | "PULL"
+  | "LEGS"
+  | "UPPER"
+  | "LOWER"
+  | "FULL_BODY"
+  | "ARMS"
+  | "CORE";
 
 // Difficulty scale 1-3
 export type Difficulty = 1 | 2 | 3;
@@ -78,7 +92,7 @@ export interface WorkoutSet {
   duration?: number; // For CORE pattern exercises (seconds)
   is_completed: boolean;
   completed_at?: string;
-  sync_status?: 'pending' | 'synced' | 'failed';
+  sync_status?: "pending" | "synced" | "failed";
 }
 
 // Exercise within an active workout (snapshot)
@@ -131,86 +145,105 @@ export interface LastSessionData {
   performed_at: string;
 }
 
+export interface ActiveSet {
+  id: string;
+  exercise_id: string;
+  set_type: SetType;
+  weight: number;
+  reps?: number;
+  duration?: number;
+  is_completed: boolean;
+}
+
+export interface ActiveSetCreate {
+  exercise_id: string;
+  set_type: SetType;
+  weight: number;
+  reps: number;
+  duration?: number;
+  is_completed: boolean;
+}
+
 // Set type display helpers
 export const SET_TYPE_LABELS: Record<SetType, string> = {
-  WARMUP: 'W',
-  WORKING: 'R',
-  MYOREP: 'M',
-  FAILURE: 'F',
-  AMRAP: 'A',
+  WARMUP: "W",
+  WORKING: "R",
+  MYOREP: "M",
+  FAILURE: "F",
+  AMRAP: "A",
 };
 
 export const SET_TYPE_NAMES: Record<SetType, string> = {
-  WARMUP: 'Warm-up',
-  WORKING: 'Working',
-  MYOREP: 'Myo-rep',
-  FAILURE: 'Failure',
-  AMRAP: 'AMRAP',
+  WARMUP: "Warm-up",
+  WORKING: "Working",
+  MYOREP: "Myo-rep",
+  FAILURE: "Failure",
+  AMRAP: "AMRAP",
 };
 
 export const PRIMARY_MUSCLE_GROUP_LABELS: Record<PrimaryMuscleGroup, string> = {
-  LEGS: 'Legs',
-  CHEST: 'Chest',
-  BACK: 'Back',
-  ARMS: 'Arms',
-  CORE: 'Core',
-  SHOULDERS: 'Shoulders',
+  LEGS: "Legs",
+  CHEST: "Chest",
+  BACK: "Back",
+  ARMS: "Arms",
+  CORE: "Core",
+  SHOULDERS: "Shoulders",
 };
 
 export const PRIMARY_MUSCLE_LABELS: Record<PrimaryMuscle, string> = {
-  QUADS: 'Quads',
-  HAMSTRINGS: 'Hamstrings',
-  GLUTES: 'Glutes',
-  CALVES: 'Calves',
-  PECS: 'Pecs',
-  LATS: 'Lats',
-  TRAPS: 'Traps',
-  RHOMBOIDS: 'Rhomboids',
-  BICEPS: 'Biceps',
-  TRICEPS: 'Triceps',
-  FOREARMS: 'Forearms',
-  ANTERIOR_DELTS: 'Front Delts',
-  LATERAL_DELTS: 'Side Delts',
-  REAR_DELTS: 'Rear Delts',
-  ABS: 'Abs',
-  OBLIQUES: 'Obliques',
-  LOWER_BACK: 'Lower Back',
+  QUADS: "Quads",
+  HAMSTRINGS: "Hamstrings",
+  GLUTES: "Glutes",
+  CALVES: "Calves",
+  PECS: "Pecs",
+  LATS: "Lats",
+  TRAPS: "Traps",
+  RHOMBOIDS: "Rhomboids",
+  BICEPS: "Biceps",
+  TRICEPS: "Triceps",
+  FOREARMS: "Forearms",
+  ANTERIOR_DELTS: "Front Delts",
+  LATERAL_DELTS: "Side Delts",
+  REAR_DELTS: "Rear Delts",
+  ABS: "Abs",
+  OBLIQUES: "Obliques",
+  LOWER_BACK: "Lower Back",
 };
 
 export const MOVEMENT_PATTERN_LABELS: Record<MovementPattern, string> = {
-  SQUAT: 'Squat',
-  HINGE: 'Hinge',
-  HORIZONTAL_PUSH: 'Horizontal Push',
-  HORIZONTAL_PULL: 'Horizontal Pull',
-  VERTICAL_PUSH: 'Vertical Push',
-  VERTICAL_PULL: 'Vertical Pull',
-  ISOLATION: 'Isolation',
-  CORE: 'Core',
+  SQUAT: "Squat",
+  HINGE: "Hinge",
+  HORIZONTAL_PUSH: "Horizontal Push",
+  HORIZONTAL_PULL: "Horizontal Pull",
+  VERTICAL_PUSH: "Vertical Push",
+  VERTICAL_PULL: "Vertical Pull",
+  ISOLATION: "Isolation",
+  CORE: "Core",
 };
 
 export const EQUIPMENT_LABELS: Record<Equipment, string> = {
-  BARBELL: 'Barbell',
-  DUMBBELL: 'Dumbbell',
-  CABLE: 'Cable',
-  MACHINE: 'Machine',
-  BODYWEIGHT: 'Bodyweight',
-  KETTLEBELL: 'Kettlebell',
-  BANDS: 'Bands',
-  OTHER: 'Other',
+  BARBELL: "Barbell",
+  DUMBBELL: "Dumbbell",
+  CABLE: "Cable",
+  MACHINE: "Machine",
+  BODYWEIGHT: "Bodyweight",
+  KETTLEBELL: "Kettlebell",
+  BANDS: "Bands",
+  OTHER: "Other",
 };
 
 export const TEMPLATE_TAG_LABELS: Record<TemplateTag, string> = {
-  PUSH: 'Push',
-  PULL: 'Pull',
-  LEGS: 'Legs',
-  UPPER: 'Upper',
-  LOWER: 'Lower',
-  FULL_BODY: 'Full Body',
-  ARMS: 'Arms',
-  CORE: 'Core',
+  PUSH: "Push",
+  PULL: "Pull",
+  LEGS: "Legs",
+  UPPER: "Upper",
+  LOWER: "Lower",
+  FULL_BODY: "Full Body",
+  ARMS: "Arms",
+  CORE: "Core",
 };
 
 // Helper to check if exercise uses duration instead of reps
 export const isIsometricExercise = (exercise: Exercise): boolean => {
-  return exercise.movement_pattern === 'CORE';
+  return exercise.movement_pattern === "CORE";
 };
